@@ -42,6 +42,10 @@ export const zh: Translation = {
   propertyRequired: "必填",
   propertyOptional: "可选",
   propertyDelete: "删除字段",
+  propertyMoveUp: "向上移动字段",
+  propertyMoveDown: "向下移动字段",
+  propertyDefaultLabel: "默认值",
+  propertyDefaultPlaceholder: "输入默认值...",
 
   schemaEditorTitle: "JSON Schema 编辑器",
   schemaEditorToggleFullscreen: "切换全屏",

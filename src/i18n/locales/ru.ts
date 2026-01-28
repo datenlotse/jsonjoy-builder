@@ -44,6 +44,10 @@ export const ru: Translation = {
   propertyRequired: "Обязательное",
   propertyOptional: "Необязательное",
   propertyDelete: "Удалить поле",
+  propertyMoveUp: "Переместить поле вверх",
+  propertyMoveDown: "Переместить поле вниз",
+  propertyDefaultLabel: "Значение по умолчанию",
+  propertyDefaultPlaceholder: "Введите значение по умолчанию...",
 
   schemaEditorTitle: "Редактор JSON схем",
   schemaEditorToggleFullscreen: "Переключить полноэкранный режим",

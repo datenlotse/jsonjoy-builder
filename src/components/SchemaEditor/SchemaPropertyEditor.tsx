@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, ChevronRight, ChevronUp, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "../../components/ui/input.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
@@ -28,6 +28,8 @@ export interface SchemaPropertyEditorProps {
   onNameChange: (newName: string) => void;
   onRequiredChange: (required: boolean) => void;
   onSchemaChange: (schema: ObjectJSONSchema) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   depth?: number;
 }
 
@@ -41,6 +43,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   onNameChange,
   onRequiredChange,
   onSchemaChange,
+  onMoveUp,
+  onMoveDown,
   depth = 0,
 }) => {
   const t = useTranslation();
@@ -55,11 +59,19 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     "object" as SchemaType,
   );
 
+  const defaultValue = useMemo(() => {
+    const objSchema = asObjectSchema(schema);
+    return objSchema.default !== undefined ? String(objSchema.default) : "";
+  }, [schema]);
+
+  const [tempDefault, setTempDefault] = useState(defaultValue);
+
   // Update temp values when props change
   useEffect(() => {
     setTempName(name);
     setTempDesc(getSchemaDescription(schema));
-  }, [name, schema]);
+    setTempDefault(defaultValue);
+  }, [name, schema, defaultValue]);
 
   const handleNameSubmit = () => {
     const trimmedName = tempName.trim();
@@ -84,13 +96,56 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     setIsEditingDesc(false);
   };
 
-  // Handle schema changes, preserving description
+  // Handle schema changes, preserving description and default
   const handleSchemaUpdate = (updatedSchema: ObjectJSONSchema) => {
     const description = getSchemaDescription(schema);
+    const currentDefault = asObjectSchema(schema).default;
     onSchemaChange({
       ...updatedSchema,
       description: description || undefined,
+      default: currentDefault,
     });
+  };
+
+  // Handle default value change
+  const handleDefaultSubmit = () => {
+    const trimmedDefault = tempDefault.trim();
+    const objSchema = asObjectSchema(schema);
+    const currentDefault = objSchema.default;
+
+    if (trimmedDefault === "") {
+      // Remove default if empty
+      if (currentDefault !== undefined) {
+        const { default: _, ...rest } = objSchema;
+        onSchemaChange(rest);
+      }
+    } else {
+      // Try to parse based on type
+      let parsedValue: unknown = trimmedDefault;
+      if (type === "number" || type === "integer") {
+        parsedValue = Number(trimmedDefault);
+        if (Number.isNaN(parsedValue)) {
+          parsedValue = trimmedDefault; // Keep as string if not a valid number
+        }
+      } else if (type === "boolean") {
+        if (trimmedDefault.toLowerCase() === "true") {
+          parsedValue = true;
+        } else if (trimmedDefault.toLowerCase() === "false") {
+          parsedValue = false;
+        } else {
+          parsedValue = trimmedDefault; // Keep as string if not valid boolean
+        }
+      } else if (type === "null") {
+        parsedValue = null;
+      }
+
+      if (JSON.stringify(currentDefault) !== JSON.stringify(parsedValue)) {
+        onSchemaChange({
+          ...objSchema,
+          default: parsedValue,
+        });
+      }
+    }
   };
 
   return (
@@ -209,9 +264,29 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           </Badge>
         )}
 
-        {/* Delete button */}
+        {/* Action buttons */}
         {!readOnly && (
           <div className="flex items-center gap-1 text-muted-foreground">
+            {onMoveUp && (
+              <button
+                type="button"
+                onClick={onMoveUp}
+                className="p-1 rounded-md hover:bg-secondary hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
+                aria-label={t.propertyMoveUp}
+              >
+                <ChevronUp size={16} />
+              </button>
+            )}
+            {onMoveDown && (
+              <button
+                type="button"
+                onClick={onMoveDown}
+                className="p-1 rounded-md hover:bg-secondary hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
+                aria-label={t.propertyMoveDown}
+              >
+                <ChevronDown size={16} />
+              </button>
+            )}
             <button
               type="button"
               onClick={onDelete}
@@ -226,8 +301,26 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
       {/* Type-specific editor */}
       {expanded && (
-        <div className="pt-1 pb-2 px-2 sm:px-3 animate-in">
+        <div className="pt-1 pb-2 px-2 sm:px-3 animate-in space-y-3">
           {readOnly && tempDesc && <p className="pb-2">{tempDesc}</p>}
+          
+          {/* Default value editor - not shown for object type as it's just a container */}
+          {!readOnly && type !== "object" && (
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">
+                {t.propertyDefaultLabel}
+              </label>
+              <Input
+                value={tempDefault}
+                onChange={(e) => setTempDefault(e.target.value)}
+                onBlur={handleDefaultSubmit}
+                onKeyDown={(e) => e.key === "Enter" && handleDefaultSubmit()}
+                placeholder={t.propertyDefaultPlaceholder}
+                className="h-8 text-sm"
+              />
+            </div>
+          )}
+
           <TypeEditor
             schema={schema}
             readOnly={readOnly}

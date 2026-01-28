@@ -43,6 +43,10 @@ export const uk: Translation = {
   propertyRequired: "Обов'язкове",
   propertyOptional: "Необов'язкове",
   propertyDelete: "Видалити поле",
+  propertyMoveUp: "Перемістити поле вгору",
+  propertyMoveDown: "Перемістити поле вниз",
+  propertyDefaultLabel: "Значення за замовчуванням",
+  propertyDefaultPlaceholder: "Введіть значення за замовчуванням...",
 
   schemaEditorTitle: "Редактор JSON-схем",
   schemaEditorToggleFullscreen: "Перемкнути повноекранний режим",

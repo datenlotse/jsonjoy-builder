@@ -16,12 +16,14 @@ interface SchemaFieldListProps {
   onAddField: (newField: NewField) => void;
   onEditField: (name: string, updatedField: NewField) => void;
   onDeleteField: (name: string) => void;
+  onReorderField?: (name: string, direction: "up" | "down") => void;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
   schema,
   onEditField,
   onDeleteField,
+  onReorderField,
   readOnly = false,
 }) => {
   const t = useTranslation();
@@ -47,18 +49,18 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     const property = properties.find((prop) => prop.name === oldName);
     if (!property) return;
 
+    const propSchemaObj =
+      typeof property.schema === "boolean"
+        ? { type: "object" as SchemaType }
+        : property.schema;
+
     onEditField(oldName, {
       name: newName,
       type: getValidSchemaType(property.schema),
-      description:
-        typeof property.schema === "boolean"
-          ? ""
-          : property.schema.description || "",
+      description: propSchemaObj.description || "",
       required: property.required,
-      validation:
-        typeof property.schema === "boolean"
-          ? { type: "object" }
-          : property.schema,
+      default: propSchemaObj.default,
+      validation: propSchemaObj,
     });
   };
 
@@ -67,18 +69,18 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     const property = properties.find((prop) => prop.name === name);
     if (!property) return;
 
+    const propSchemaObj =
+      typeof property.schema === "boolean"
+        ? { type: "object" as SchemaType }
+        : property.schema;
+
     onEditField(name, {
       name,
       type: getValidSchemaType(property.schema),
-      description:
-        typeof property.schema === "boolean"
-          ? ""
-          : property.schema.description || "",
+      description: propSchemaObj.description || "",
       required,
-      validation:
-        typeof property.schema === "boolean"
-          ? { type: "object" }
-          : property.schema,
+      default: propSchemaObj.default,
+      validation: propSchemaObj,
     });
   };
 
@@ -99,6 +101,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
       type: validType,
       description: updatedSchema.description || "",
       required: property.required,
+      default: updatedSchema.default,
       validation: updatedSchema,
     });
   };
@@ -110,7 +113,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
 
   return (
     <div className="space-y-2 animate-in">
-      {properties.map((property) => (
+      {properties.map((property, index) => (
         <SchemaPropertyEditor
           key={property.name}
           name={property.name}
@@ -123,6 +126,16 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             handleRequiredChange(property.name, required)
           }
           onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
+          onMoveUp={
+            onReorderField && index > 0
+              ? () => onReorderField(property.name, "up")
+              : undefined
+          }
+          onMoveDown={
+            onReorderField && index < properties.length - 1
+              ? () => onReorderField(property.name, "down")
+              : undefined
+          }
           readOnly={readOnly}
         />
       ))}

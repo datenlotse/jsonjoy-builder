@@ -231,6 +231,30 @@ export interface Translation {
    * > Delete field
    */
   readonly propertyDelete: string;
+  /**
+   * The translation for the key `propertyMoveUp`. English default is:
+   *
+   * > Move field up
+   */
+  readonly propertyMoveUp: string;
+  /**
+   * The translation for the key `propertyMoveDown`. English default is:
+   *
+   * > Move field down
+   */
+  readonly propertyMoveDown: string;
+  /**
+   * The translation for the key `propertyDefaultLabel`. English default is:
+   *
+   * > Default Value
+   */
+  readonly propertyDefaultLabel: string;
+  /**
+   * The translation for the key `propertyDefaultPlaceholder`. English default is:
+   *
+   * > Enter default value...
+   */
+  readonly propertyDefaultPlaceholder: string;
 
   /**
    * The translation for the key `arrayNoConstraint`. English default is:

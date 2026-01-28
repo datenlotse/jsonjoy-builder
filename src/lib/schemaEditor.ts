@@ -31,7 +31,16 @@ export function updateObjectProperty(
     newSchema.properties = {};
   }
 
+  const isNewProperty = !(propertyName in newSchema.properties);
   newSchema.properties[propertyName] = propertySchema;
+
+  // Maintain $propertyOrder array
+  if (!newSchema.$propertyOrder) {
+    newSchema.$propertyOrder = Object.keys(newSchema.properties);
+  } else if (isNewProperty && !newSchema.$propertyOrder.includes(propertyName)) {
+    newSchema.$propertyOrder.push(propertyName);
+  }
+
   return newSchema;
 }
 
@@ -51,6 +60,13 @@ export function removeObjectProperty(
   // Also remove from required array if present
   if (newSchema.required) {
     newSchema.required = newSchema.required.filter(
+      (name) => name !== propertyName,
+    );
+  }
+
+  // Remove from $propertyOrder array if present
+  if (newSchema.$propertyOrder) {
+    newSchema.$propertyOrder = newSchema.$propertyOrder.filter(
       (name) => name !== propertyName,
     );
   }
@@ -108,15 +124,23 @@ export function updateArrayItems(
  * Creates a schema for a new field
  */
 export function createFieldSchema(field: NewField): JSONSchema {
-  const { type, description, validation } = field;
+  const { type, description, default: defaultValue, validation } = field;
   if (isObjectSchema(validation)) {
-    return {
+    const schema: ObjectJSONSchema = {
       type,
       description,
       ...validation,
     };
+    if (defaultValue !== undefined) {
+      schema.default = defaultValue;
+    }
+    return schema;
   }
-  return validation;
+  const schema: ObjectJSONSchema = validation || { type };
+  if (defaultValue !== undefined) {
+    schema.default = defaultValue;
+  }
+  return schema;
 }
 
 /**
@@ -133,16 +157,29 @@ export function validateFieldName(name: string): boolean {
 }
 
 /**
- * Gets properties from an object schema
+ * Gets properties from an object schema, respecting $propertyOrder if present
  */
 export function getSchemaProperties(schema: JSONSchema): Property[] {
   if (!isObjectSchema(schema) || !schema.properties) return [];
 
   const required = schema.required || [];
+  const propertyOrder = schema.$propertyOrder || Object.keys(schema.properties);
 
-  return Object.entries(schema.properties).map(([name, propSchema]) => ({
+  // Filter to only include properties that actually exist
+  const orderedPropertyNames = propertyOrder.filter(
+    (name) => name in schema.properties!,
+  );
+
+  // Add any properties that aren't in the order array (for backward compatibility)
+  const allPropertyNames = Object.keys(schema.properties);
+  const missingProperties = allPropertyNames.filter(
+    (name) => !orderedPropertyNames.includes(name),
+  );
+  const finalOrder = [...orderedPropertyNames, ...missingProperties];
+
+  return finalOrder.map((name) => ({
     name,
-    schema: propSchema,
+    schema: schema.properties![name],
     required: required.includes(name),
   }));
 }
@@ -170,11 +207,21 @@ export function renameObjectProperty(
   const newSchema = copySchema(schema);
   const newProperties: Record<string, JSONSchema> = {};
 
-  // Iterate through properties in order, replacing old key with new key
-  for (const [key, value] of Object.entries(newSchema.properties)) {
+  // Get ordered property names
+  const propertyOrder = newSchema.$propertyOrder || Object.keys(newSchema.properties);
+  
+  // Reconstruct properties in order, replacing old key with new key
+  for (const key of propertyOrder) {
     if (key === oldName) {
-      newProperties[newName] = value;
-    } else {
+      newProperties[newName] = newSchema.properties[oldName];
+    } else if (key in newSchema.properties) {
+      newProperties[key] = newSchema.properties[key];
+    }
+  }
+
+  // Add any properties not in the order array
+  for (const [key, value] of Object.entries(newSchema.properties)) {
+    if (!(key in newProperties)) {
       newProperties[key] = value;
     }
   }
@@ -187,6 +234,66 @@ export function renameObjectProperty(
       field === oldName ? newName : field,
     );
   }
+
+  // Update $propertyOrder array if present
+  if (newSchema.$propertyOrder) {
+    newSchema.$propertyOrder = newSchema.$propertyOrder.map((name) =>
+      name === oldName ? newName : name,
+    );
+  }
+
+  return newSchema;
+}
+
+/**
+ * Reorders a property in an object schema by moving it up or down
+ */
+export function reorderObjectProperty(
+  schema: ObjectJSONSchema,
+  propertyName: string,
+  direction: "up" | "down",
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+
+  const newSchema = copySchema(schema);
+  
+  // Initialize $propertyOrder if not present
+  if (!newSchema.$propertyOrder) {
+    newSchema.$propertyOrder = Object.keys(newSchema.properties);
+  }
+
+  const propertyOrder = [...newSchema.$propertyOrder];
+  const currentIndex = propertyOrder.indexOf(propertyName);
+
+  // Check if reordering is possible
+  if (currentIndex === -1) return schema;
+  if (direction === "up" && currentIndex === 0) return schema;
+  if (direction === "down" && currentIndex === propertyOrder.length - 1) return schema;
+
+  // Swap with adjacent property
+  const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+  [propertyOrder[currentIndex], propertyOrder[targetIndex]] = [
+    propertyOrder[targetIndex],
+    propertyOrder[currentIndex],
+  ];
+
+  // Reconstruct properties object in new order
+  const newProperties: Record<string, JSONSchema> = {};
+  for (const name of propertyOrder) {
+    if (name in newSchema.properties) {
+      newProperties[name] = newSchema.properties[name];
+    }
+  }
+
+  // Add any properties not in the order array (shouldn't happen, but for safety)
+  for (const [key, value] of Object.entries(newSchema.properties)) {
+    if (!(key in newProperties)) {
+      newProperties[key] = value;
+    }
+  }
+
+  newSchema.properties = newProperties;
+  newSchema.$propertyOrder = propertyOrder;
 
   return newSchema;
 }

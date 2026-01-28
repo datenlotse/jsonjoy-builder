@@ -43,6 +43,10 @@ export const es: Translation = {
   propertyRequired: "Requerido",
   propertyOptional: "Opcional",
   propertyDelete: "Eliminar campo",
+  propertyMoveUp: "Mover campo hacia arriba",
+  propertyMoveDown: "Mover campo hacia abajo",
+  propertyDefaultLabel: "Valor por defecto",
+  propertyDefaultPlaceholder: "Ingresar valor por defecto...",
 
   schemaEditorTitle: "Editor de JSON Schema",
   schemaEditorToggleFullscreen: "Cambiar a pantalla completa",

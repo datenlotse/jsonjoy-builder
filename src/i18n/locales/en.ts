@@ -42,6 +42,10 @@ export const en: Translation = {
   propertyRequired: "Required",
   propertyOptional: "Optional",
   propertyDelete: "Delete field",
+  propertyMoveUp: "Move field up",
+  propertyMoveDown: "Move field down",
+  propertyDefaultLabel: "Default Value",
+  propertyDefaultPlaceholder: "Enter default value...",
 
   schemaEditorTitle: "JSON Schema Editor",
   schemaEditorToggleFullscreen: "Toggle fullscreen",

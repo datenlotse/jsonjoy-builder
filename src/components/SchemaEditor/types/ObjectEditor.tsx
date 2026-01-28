@@ -1,6 +1,7 @@
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import {
   getSchemaProperties,
+  reorderObjectProperty,
   removeObjectProperty,
   updateObjectProperty,
   updatePropertyRequired,
@@ -36,6 +37,11 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
       description: newField.description || undefined,
       ...(newField.validation || {}),
     } as ObjectJSONSchema;
+    
+    // Include default value if present
+    if (newField.default !== undefined) {
+      fieldSchema.default = newField.default;
+    }
 
     // Add the property to the schema
     let newSchema = updateObjectProperty(
@@ -109,11 +115,24 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
     onChange(newSchema);
   };
 
+  // Handle reordering a property
+  const handleReorderProperty = (
+    propertyName: string,
+    direction: "up" | "down",
+  ) => {
+    const newSchema = reorderObjectProperty(
+      normalizedSchema,
+      propertyName,
+      direction,
+    );
+    onChange(newSchema);
+  };
+
   return (
     <div className="space-y-4">
       {properties.length > 0 ? (
         <div className="space-y-2">
-          {properties.map((property) => (
+          {properties.map((property, index) => (
             <SchemaPropertyEditor
               readOnly={readOnly}
               key={property.name}
@@ -130,6 +149,16 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
               }
               onSchemaChange={(schema) =>
                 handlePropertySchemaChange(property.name, schema)
+              }
+              onMoveUp={
+                index > 0
+                  ? () => handleReorderProperty(property.name, "up")
+                  : undefined
+              }
+              onMoveDown={
+                index < properties.length - 1
+                  ? () => handleReorderProperty(property.name, "down")
+                  : undefined
               }
               depth={depth}
             />

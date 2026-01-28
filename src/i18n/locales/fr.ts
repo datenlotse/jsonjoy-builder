@@ -44,6 +44,10 @@ export const fr: Translation = {
   propertyRequired: "Obligatoire",
   propertyOptional: "Facultatif",
   propertyDelete: "Supprimer le champ",
+  propertyMoveUp: "Déplacer le champ vers le haut",
+  propertyMoveDown: "Déplacer le champ vers le bas",
+  propertyDefaultLabel: "Valeur par défaut",
+  propertyDefaultPlaceholder: "Entrer la valeur par défaut...",
 
   schemaEditorTitle: "Éditeur de schéma JSON",
   schemaEditorToggleFullscreen: "Basculer en plein écran",

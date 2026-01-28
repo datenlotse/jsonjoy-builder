@@ -90,6 +90,8 @@ export type JSONSchema =
       if?: JSONSchema;
       then?: JSONSchema;
       else?: JSONSchema;
+      // Custom extension for explicit property ordering
+      $propertyOrder?: string[];
     });
 
 // Define Zod schema with recursive types
@@ -129,6 +131,7 @@ export interface NewField {
   type: SchemaType;
   description: string;
   required: boolean;
+  default?: unknown;
   validation?: ObjectJSONSchema;
 }
 

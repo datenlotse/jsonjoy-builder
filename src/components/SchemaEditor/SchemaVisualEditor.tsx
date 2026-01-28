@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {
   createFieldSchema,
+  reorderObjectProperty,
   renameObjectProperty,
   updateObjectProperty,
   updatePropertyRequired,
@@ -98,7 +99,24 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
       newSchema.required = newSchema.required.filter((field) => field !== name);
     }
 
+    // Remove from $propertyOrder array if present
+    if (newSchema.$propertyOrder) {
+      newSchema.$propertyOrder = newSchema.$propertyOrder.filter(
+        (field) => field !== name,
+      );
+    }
+
     // Update the schema
+    onChange(newSchema);
+  };
+
+  // Handle reordering a top-level field
+  const handleReorderField = (name: string, direction: "up" | "down") => {
+    const newSchema = reorderObjectProperty(
+      asObjectSchema(schema),
+      name,
+      direction,
+    );
     onChange(newSchema);
   };
 
@@ -128,6 +146,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
             onAddField={handleAddField}
             onEditField={handleEditField}
             onDeleteField={handleDeleteField}
+            onReorderField={handleReorderField}
           />
         )}
       </div>
