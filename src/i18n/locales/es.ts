@@ -47,6 +47,11 @@ export const es: Translation = {
   propertyMoveDown: "Mover campo hacia abajo",
   propertyDefaultLabel: "Valor por defecto",
   propertyDefaultPlaceholder: "Ingresar valor por defecto...",
+  propertyDefaultMustBeInEnum:
+    "El valor por defecto debe ser uno de los valores permitidos.",
+  propertyDefaultRequiresDependentDefault:
+    "El valor por defecto solo puede establecerse cuando la propiedad dependiente tiene un valor por defecto.",
+  propertyDefaultNone: "Sin valor por defecto",
 
   schemaEditorTitle: "Editor de JSON Schema",
   schemaEditorToggleFullscreen: "Cambiar a pantalla completa",

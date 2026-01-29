@@ -255,6 +255,24 @@ export interface Translation {
    * > Enter default value...
    */
   readonly propertyDefaultPlaceholder: string;
+  /**
+   * The translation for the key `propertyDefaultMustBeInEnum`. English default is:
+   *
+   * > Default value must be one of the allowed values.
+   */
+  readonly propertyDefaultMustBeInEnum: string;
+  /**
+   * The translation for the key `propertyDefaultRequiresDependentDefault`. English default is:
+   *
+   * > Default can only be set when the dependent property has a default.
+   */
+  readonly propertyDefaultRequiresDependentDefault: string;
+  /**
+   * The translation for the key `propertyDefaultNone`. English default is:
+   *
+   * > No default
+   */
+  readonly propertyDefaultNone: string;
 
   /**
    * The translation for the key `arrayNoConstraint`. English default is:

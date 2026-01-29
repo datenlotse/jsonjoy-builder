@@ -46,6 +46,10 @@ export const zh: Translation = {
   propertyMoveDown: "向下移动字段",
   propertyDefaultLabel: "默认值",
   propertyDefaultPlaceholder: "输入默认值...",
+  propertyDefaultMustBeInEnum: "默认值必须是允许的值之一。",
+  propertyDefaultRequiresDependentDefault:
+    "只有在依赖属性具有默认值时才能设置默认值。",
+  propertyDefaultNone: "无默认值",
 
   schemaEditorTitle: "JSON Schema 编辑器",
   schemaEditorToggleFullscreen: "切换全屏",

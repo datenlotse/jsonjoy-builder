@@ -48,6 +48,11 @@ export const ru: Translation = {
   propertyMoveDown: "Переместить поле вниз",
   propertyDefaultLabel: "Значение по умолчанию",
   propertyDefaultPlaceholder: "Введите значение по умолчанию...",
+  propertyDefaultMustBeInEnum:
+    "Значение по умолчанию должно быть одним из разрешенных значений.",
+  propertyDefaultRequiresDependentDefault:
+    "Значение по умолчанию может быть установлено только тогда, когда зависимое свойство имеет значение по умолчанию.",
+  propertyDefaultNone: "Нет значения по умолчанию",
 
   schemaEditorTitle: "Редактор JSON схем",
   schemaEditorToggleFullscreen: "Переключить полноэкранный режим",

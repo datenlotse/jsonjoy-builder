@@ -47,6 +47,11 @@ export const uk: Translation = {
   propertyMoveDown: "Перемістити поле вниз",
   propertyDefaultLabel: "Значення за замовчуванням",
   propertyDefaultPlaceholder: "Введіть значення за замовчуванням...",
+  propertyDefaultMustBeInEnum:
+    "Значення за замовчуванням повинно бути одним з дозволених значень.",
+  propertyDefaultRequiresDependentDefault:
+    "Значення за замовчуванням може бути встановлено лише тоді, коли залежна властивість має значення за замовчуванням.",
+  propertyDefaultNone: "Немає значення за замовчуванням",
 
   schemaEditorTitle: "Редактор JSON-схем",
   schemaEditorToggleFullscreen: "Перемкнути повноекранний режим",

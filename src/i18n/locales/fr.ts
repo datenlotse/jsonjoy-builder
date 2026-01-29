@@ -48,6 +48,11 @@ export const fr: Translation = {
   propertyMoveDown: "Déplacer le champ vers le bas",
   propertyDefaultLabel: "Valeur par défaut",
   propertyDefaultPlaceholder: "Entrer la valeur par défaut...",
+  propertyDefaultMustBeInEnum:
+    "La valeur par défaut doit être l'une des valeurs autorisées.",
+  propertyDefaultRequiresDependentDefault:
+    "La valeur par défaut ne peut être définie que lorsque la propriété dépendante a une valeur par défaut.",
+  propertyDefaultNone: "Aucune valeur par défaut",
 
   schemaEditorTitle: "Éditeur de schéma JSON",
   schemaEditorToggleFullscreen: "Basculer en plein écran",

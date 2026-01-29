@@ -46,6 +46,10 @@ export const en: Translation = {
   propertyMoveDown: "Move field down",
   propertyDefaultLabel: "Default Value",
   propertyDefaultPlaceholder: "Enter default value...",
+  propertyDefaultMustBeInEnum: "Default value must be one of the allowed values.",
+  propertyDefaultRequiresDependentDefault:
+    "Default can only be set when the dependent property has a default.",
+  propertyDefaultNone: "No default",
 
   schemaEditorTitle: "JSON Schema Editor",
   schemaEditorToggleFullscreen: "Toggle fullscreen",

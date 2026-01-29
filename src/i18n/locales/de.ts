@@ -47,6 +47,11 @@ export const de: Translation = {
   propertyMoveDown: "Feld nach unten verschieben",
   propertyDefaultLabel: "Standardwert",
   propertyDefaultPlaceholder: "Standardwert eingeben...",
+  propertyDefaultMustBeInEnum:
+    "Der Standardwert muss einer der erlaubten Werte sein.",
+  propertyDefaultRequiresDependentDefault:
+    "Ein Standardwert kann nur gesetzt werden, wenn die abhängige Eigenschaft einen Standardwert hat.",
+  propertyDefaultNone: "Kein Standardwert",
 
   schemaEditorTitle: "JSON-Schema-Editor",
   schemaEditorToggleFullscreen: "Vollbild umschalten",

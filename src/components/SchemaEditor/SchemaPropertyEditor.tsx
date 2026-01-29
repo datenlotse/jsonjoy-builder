@@ -1,6 +1,13 @@
 import { ChevronDown, ChevronRight, ChevronUp, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "../../components/ui/input.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
 import type {
@@ -11,6 +18,7 @@ import type {
 import {
   asObjectSchema,
   getSchemaDescription,
+  isBooleanSchema,
   withObjectSchema,
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
@@ -68,6 +76,57 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
   const [tempDefault, setTempDefault] = useState(defaultValue);
 
+  // Determine if we should use Select for default value (enum or dependent enum)
+  const defaultValueOptions = useMemo(() => {
+    if (type !== "string" && type !== "number" && type !== "integer") {
+      return null;
+    }
+
+    const objSchema = asObjectSchema(schema);
+    const enumValues = objSchema.enum;
+    const dependentEnum = objSchema.$dependentEnum;
+
+    // Static enum
+    if (Array.isArray(enumValues) && enumValues.length > 0) {
+      return enumValues.map((v) => String(v));
+    }
+
+    // Dependent enum - only show options if controlling property has a default
+    if (dependentEnum && parentSchema) {
+      const controllingPropertyName = dependentEnum.property;
+      const controllingPropertySchema = parentSchema.properties?.[
+        controllingPropertyName
+      ];
+      if (
+        controllingPropertySchema &&
+        typeof controllingPropertySchema === "object" &&
+        !isBooleanSchema(controllingPropertySchema)
+      ) {
+        const controllingDefault = (
+          controllingPropertySchema as ObjectJSONSchema
+        ).default;
+        if (controllingDefault !== undefined) {
+          const ctrlDefaultStr = String(controllingDefault);
+          const allowedValues = dependentEnum.values[ctrlDefaultStr];
+          if (Array.isArray(allowedValues) && allowedValues.length > 0) {
+            return allowedValues.map((v) => String(v));
+          }
+        }
+      }
+    }
+
+    return null;
+  }, [schema, type, parentSchema]);
+
+  // Get default error from validation
+  const defaultError = useMemo(
+    () =>
+      validationNode?.validation.errors?.find(
+        (err) => err.path[0] === "default",
+      )?.message,
+    [validationNode],
+  );
+
   // Update temp values when props change
   useEffect(() => {
     setTempName(name);
@@ -109,7 +168,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     });
   };
 
-  // Handle default value change
+  // Handle default value change (for Input)
   const handleDefaultSubmit = () => {
     const trimmedDefault = tempDefault.trim();
     const objSchema = asObjectSchema(schema);
@@ -139,6 +198,36 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         }
       } else if (type === "null") {
         parsedValue = null;
+      }
+
+      if (JSON.stringify(currentDefault) !== JSON.stringify(parsedValue)) {
+        onSchemaChange({
+          ...objSchema,
+          default: parsedValue,
+        });
+      }
+    }
+  };
+
+  // Handle default value change (for Select)
+  const handleDefaultSelectChange = (value: string) => {
+    const objSchema = asObjectSchema(schema);
+    const currentDefault = objSchema.default;
+
+    if (value === "__none__" || value === "") {
+      // Remove default
+      if (currentDefault !== undefined) {
+        const { default: _, ...rest } = objSchema;
+        onSchemaChange(rest);
+      }
+    } else {
+      // Parse based on type
+      let parsedValue: unknown = value;
+      if (type === "number" || type === "integer") {
+        parsedValue = Number(value);
+        if (Number.isNaN(parsedValue)) {
+          parsedValue = value; // Keep as string if not a valid number
+        }
       }
 
       if (JSON.stringify(currentDefault) !== JSON.stringify(parsedValue)) {
@@ -312,14 +401,47 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               <label className="text-xs font-medium text-muted-foreground">
                 {t.propertyDefaultLabel}
               </label>
-              <Input
-                value={tempDefault}
-                onChange={(e) => setTempDefault(e.target.value)}
-                onBlur={handleDefaultSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleDefaultSubmit()}
-                placeholder={t.propertyDefaultPlaceholder}
-                className="h-8 text-sm"
-              />
+              {defaultValueOptions && defaultValueOptions.length > 0 ? (
+                <Select
+                  value={
+                    defaultValue !== "" &&
+                    defaultValueOptions.includes(defaultValue)
+                      ? defaultValue
+                      : "__none__"
+                  }
+                  onValueChange={handleDefaultSelectChange}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder={t.propertyDefaultPlaceholder} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">
+                      {t.propertyDefaultNone}
+                    </SelectItem>
+                    {defaultValueOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={tempDefault}
+                  onChange={(e) => setTempDefault(e.target.value)}
+                  onBlur={handleDefaultSubmit}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && handleDefaultSubmit()
+                  }
+                  placeholder={t.propertyDefaultPlaceholder}
+                  className="h-8 text-sm"
+                />
+              )}
+              {defaultError && (
+                <div className="text-xs text-destructive italic">
+                  {defaultError}
+                </div>
+              )}
             </div>
           )}
 

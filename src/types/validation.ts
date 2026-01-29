@@ -1,6 +1,11 @@
 import z from "zod";
 import type { Translation } from "../i18n/translation-keys.ts";
-import { baseSchema, type JSONSchema } from "./jsonSchema.ts";
+import {
+  baseSchema,
+  type DependentEnumExtension,
+  type JSONSchema,
+  type ObjectJSONSchema,
+} from "./jsonSchema.ts";
 
 function refineRangeConsistency(
   min: number | undefined,
@@ -217,6 +222,127 @@ export function validateSchemaByType(
   }
 }
 
+function validateDefaultInEnum(
+  schema: ObjectJSONSchema,
+  type: string,
+  t: Translation,
+  parentSchema?: ObjectJSONSchema,
+): z.core.$ZodIssue | null {
+  // Only validate for string, number, and integer types
+  if (type !== "string" && type !== "number" && type !== "integer") {
+    return null;
+  }
+
+  const defaultValue = schema.default;
+  if (defaultValue === undefined) {
+    return null; // No default to validate
+  }
+
+  // Check static enum
+  const enumValues = schema.enum;
+  if (Array.isArray(enumValues) && enumValues.length > 0) {
+    // Check if default is in enum
+    const isInEnum = enumValues.some((val) => {
+      // For type comparison, convert both to strings for comparison
+      // but also check exact equality for numbers
+      if (type === "number" || type === "integer") {
+        return (
+          val === defaultValue ||
+          (typeof val === "number" &&
+            typeof defaultValue === "number" &&
+            val === defaultValue)
+        );
+      }
+      return String(val) === String(defaultValue);
+    });
+
+    if (!isInEnum) {
+      return {
+        code: "custom",
+        message: t.propertyDefaultMustBeInEnum,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+  }
+
+  // Check dependent enum
+  const dependentEnum = schema.$dependentEnum;
+  if (dependentEnum) {
+    const controllingPropertyName = dependentEnum.property;
+    const dependentValuesMap = dependentEnum.values;
+
+    // Check if controlling property has a default
+    if (!parentSchema) {
+      // No parent schema, so we can't check the controlling property
+      // This means default can't be set (we need parent context)
+      return {
+        code: "custom",
+        message: t.propertyDefaultRequiresDependentDefault,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+
+    const controllingPropertySchema = parentSchema.properties?.[
+      controllingPropertyName
+    ];
+    if (!controllingPropertySchema || typeof controllingPropertySchema !== "object") {
+      // Controlling property doesn't exist or isn't an object schema
+      return {
+        code: "custom",
+        message: t.propertyDefaultRequiresDependentDefault,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+
+    const controllingDefault = (controllingPropertySchema as ObjectJSONSchema)
+      .default;
+    if (controllingDefault === undefined) {
+      // Controlling property has no default, so this field can't have a default
+      return {
+        code: "custom",
+        message: t.propertyDefaultRequiresDependentDefault,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+
+    // Get the allowed values for the controlling property's default
+    const ctrlDefaultStr = String(controllingDefault);
+    const allowedValues = dependentValuesMap[ctrlDefaultStr];
+
+    if (!Array.isArray(allowedValues) || allowedValues.length === 0) {
+      // No allowed values for this controlling default
+      return {
+        code: "custom",
+        message: t.propertyDefaultRequiresDependentDefault,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+
+    // Check if default is in the allowed values
+    const isInAllowedValues = allowedValues.some((val) => {
+      if (type === "number" || type === "integer") {
+        return (
+          val === defaultValue ||
+          (typeof val === "number" &&
+            typeof defaultValue === "number" &&
+            val === defaultValue)
+        );
+      }
+      return String(val) === String(defaultValue);
+    });
+
+    if (!isInAllowedValues) {
+      return {
+        code: "custom",
+        message: t.propertyDefaultMustBeInEnum,
+        path: ["default"],
+      } as z.core.$ZodIssue;
+    }
+  }
+
+  return null; // Validation passed
+}
+
 export interface ValidationTreeNode {
   name: string;
   validation: TypeValidationResult;
@@ -227,6 +353,7 @@ export interface ValidationTreeNode {
 export function buildValidationTree(
   schema: JSONSchema,
   t: Translation,
+  parentSchema?: ObjectJSONSchema,
 ): ValidationTreeNode {
   // Helper to determine a concrete type string from a schema.type which may be string | string[] | undefined
   const deriveType = (sch: unknown): string | undefined => {
@@ -277,16 +404,44 @@ export function buildValidationTree(
 
   const validation = validateSchemaByType(schema, currentType, t);
 
+  // Validate default value against enum/dependent enum if applicable
+  if (
+    currentType === "string" ||
+    currentType === "number" ||
+    currentType === "integer"
+  ) {
+    const defaultError = validateDefaultInEnum(
+      schema as ObjectJSONSchema,
+      currentType,
+      t,
+      parentSchema,
+    );
+    if (defaultError) {
+      // Merge the error into the validation result
+      if (validation.success) {
+        validation.success = false;
+        validation.errors = [defaultError];
+      } else {
+        validation.errors = [...(validation.errors || []), defaultError];
+      }
+    }
+  }
+
   const children: Record<string, ValidationTreeNode> = {};
 
   // Traverse object properties
   if (currentType === "object") {
+    const currentObjectSchema = schema as ObjectJSONSchema;
     const properties = sch.properties;
     if (properties && typeof properties === "object") {
       for (const [propName, propSchema] of Object.entries(
         properties as Record<string, JSONSchema>,
       )) {
-        children[propName] = buildValidationTree(propSchema, t);
+        children[propName] = buildValidationTree(
+          propSchema,
+          t,
+          currentObjectSchema,
+        );
       }
     }
     // handle dependentSchemas, patternProperties etc. if present (shallow support)
@@ -297,6 +452,7 @@ export function buildValidationTree(
         children[`pattern:${patternName}`] = buildValidationTree(
           patternSchema,
           t,
+          currentObjectSchema,
         );
       }
     }
@@ -307,15 +463,23 @@ export function buildValidationTree(
     const items = sch.items;
     if (Array.isArray(items)) {
       items.forEach((it, idx) => {
-        children[`items[${idx}]`] = buildValidationTree(it, t);
+        children[`items[${idx}]`] = buildValidationTree(it, t, parentSchema);
       });
     } else if (items) {
-      children.items = buildValidationTree(items as JSONSchema, t);
+      children.items = buildValidationTree(
+        items as JSONSchema,
+        t,
+        parentSchema,
+      );
     }
 
     if (Array.isArray(sch.prefixItems)) {
       (sch.prefixItems as JSONSchema[]).forEach((it, idx) => {
-        children[`prefixItems[${idx}]`] = buildValidationTree(it, t);
+        children[`prefixItems[${idx}]`] = buildValidationTree(
+          it,
+          t,
+          parentSchema,
+        );
       });
     }
   }
@@ -333,13 +497,14 @@ export function buildValidationTree(
         children[[comb, idx].join(":")] = buildValidationTree(
           subSchema as JSONSchema,
           t,
+          parentSchema,
         );
       });
     }
   }
 
   if (sch.not) {
-    children.not = buildValidationTree(sch.not as JSONSchema, t);
+    children.not = buildValidationTree(sch.not as JSONSchema, t, parentSchema);
   }
 
   // $defs / definitions / dependentSchemas (shallow)
@@ -347,7 +512,11 @@ export function buildValidationTree(
     for (const [defName, defSchema] of Object.entries(
       sch.$defs as Record<string, JSONSchema>,
     )) {
-      children[`$defs:${defName}`] = buildValidationTree(defSchema, t);
+      children[`$defs:${defName}`] = buildValidationTree(
+        defSchema,
+        t,
+        parentSchema,
+      );
     }
   }
 
@@ -357,7 +526,11 @@ export function buildValidationTree(
     for (const [defName, defSchema] of Object.entries(
       definitions as Record<string, JSONSchema>,
     )) {
-      children[`definitions:${defName}`] = buildValidationTree(defSchema, t);
+      children[`definitions:${defName}`] = buildValidationTree(
+        defSchema,
+        t,
+        parentSchema,
+      );
     }
   }
 
