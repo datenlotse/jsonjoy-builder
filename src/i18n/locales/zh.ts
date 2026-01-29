@@ -117,6 +117,10 @@ export const zh: Translation = {
   stringAllowedValuesEnumNone: "当前没有设置限制的值",
   stringAllowedValuesEnumAddPlaceholder: "添加允许的值...",
   stringAllowedValuesEnumAddLabel: "添加",
+  enumModeStatic: "固定列表",
+  enumModeDependsOn: "依赖属性",
+  enumDependsOnPlaceholder: "选择属性...",
+  whenPropertyEquals: "当 {property} = {value}",
   stringFormatSelectPlaceholder: "选择格式",
   stringValidationErrorLengthRange: "「最小长度」不能大于「最大长度」",
 

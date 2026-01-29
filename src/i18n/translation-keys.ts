@@ -603,6 +603,30 @@ export interface Translation {
    */
   readonly stringAllowedValuesEnumAddLabel: string;
   /**
+   * The translation for the key `enumModeStatic`. English default is:
+   *
+   * > Fixed list
+   */
+  readonly enumModeStatic: string;
+  /**
+   * The translation for the key `enumModeDependsOn`. English default is:
+   *
+   * > Depends on property
+   */
+  readonly enumModeDependsOn: string;
+  /**
+   * The translation for the key `enumDependsOnPlaceholder`. English default is:
+   *
+   * > Select property...
+   */
+  readonly enumDependsOnPlaceholder: string;
+  /**
+   * The translation for the key `whenPropertyEquals`. English default is:
+   *
+   * > When {property} = {value}
+   */
+  readonly whenPropertyEquals: string;
+  /**
    * The translation for the key `stringFormatSelectPlaceholder`. English default is:
    *
    * > Select format

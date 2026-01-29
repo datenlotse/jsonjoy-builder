@@ -111,6 +111,11 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     [schema, t],
   );
 
+  const parentSchema =
+    typeof schema === "boolean"
+      ? undefined
+      : (schema as ObjectJSONSchema);
+
   return (
     <div className="space-y-2 animate-in">
       {properties.map((property, index) => (
@@ -119,6 +124,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
           name={property.name}
           schema={property.schema}
           required={property.required}
+          parentSchema={parentSchema}
           validationNode={validationTree.children[property.name] ?? undefined}
           onDelete={() => onDeleteField(property.name)}
           onNameChange={(newName) => handleNameChange(property.name, newName)}

@@ -119,6 +119,10 @@ export const en: Translation = {
   stringAllowedValuesEnumNone: "No restricted values set",
   stringAllowedValuesEnumAddPlaceholder: "Add allowed value...",
   stringAllowedValuesEnumAddLabel: "Add",
+  enumModeStatic: "Fixed list",
+  enumModeDependsOn: "Depends on property",
+  enumDependsOnPlaceholder: "Select property...",
+  whenPropertyEquals: "When {property} = {value}",
   stringFormatSelectPlaceholder: "Select format",
   stringValidationErrorLengthRange:
     "'Minimum Length' cannot be greater than 'Maximum Length'.",

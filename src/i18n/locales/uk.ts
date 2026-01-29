@@ -121,6 +121,10 @@ export const uk: Translation = {
   stringAllowedValuesEnumNone: "Обмежених значень не задано",
   stringAllowedValuesEnumAddPlaceholder: "Додати дозволене значення...",
   stringAllowedValuesEnumAddLabel: "Додати",
+  enumModeStatic: "Фіксований список",
+  enumModeDependsOn: "Залежить від властивості",
+  enumDependsOnPlaceholder: "Виберіть властивість...",
+  whenPropertyEquals: "Коли {property} = {value}",
   stringFormatSelectPlaceholder: "Виберіть формат",
   stringValidationErrorLengthRange:
     "'Мінімальна довжина' не може бути більшою за 'Максимальну довжину'.",

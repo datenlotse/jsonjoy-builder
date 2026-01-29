@@ -184,6 +184,65 @@ export function getSchemaProperties(schema: JSONSchema): Property[] {
   }));
 }
 
+export interface EligibleEnumController {
+  name: string;
+  values: unknown[];
+}
+
+function hasPathTo(
+  graph: Map<string, string>,
+  from: string,
+  to: string,
+): boolean {
+  const visited = new Set<string>();
+  let current: string | undefined = from;
+  while (current) {
+    if (current === to) return true;
+    if (visited.has(current)) break;
+    visited.add(current);
+    current = graph.get(current);
+  }
+  return false;
+}
+
+/**
+ * Sibling properties that can control this property's enum (have enum/const).
+ * Order-independent; excludes any choice that would create a dependency cycle.
+ */
+export function getEligibleEnumControllingProperties(
+  parentSchema: ObjectJSONSchema,
+  propertyName: string,
+): EligibleEnumController[] {
+  if (!parentSchema.properties) return [];
+
+  const graph = new Map<string, string>();
+  for (const k of Object.keys(parentSchema.properties)) {
+    const prop = parentSchema.properties[k];
+    if (typeof prop !== "object" || prop === null) continue;
+    const dep = (prop as ObjectJSONSchema & { $dependentEnum?: { property: string } }).$dependentEnum?.property;
+    if (dep) graph.set(k, dep);
+  }
+
+  const result: EligibleEnumController[] = [];
+  const siblings = Object.keys(parentSchema.properties).filter(
+    (n) => n !== propertyName,
+  );
+  for (const name of siblings) {
+    if (hasPathTo(graph, name, propertyName)) continue;
+    const prop = parentSchema.properties[name];
+    if (typeof prop === "boolean") continue;
+    if (!prop) continue;
+    let values: unknown[] | undefined;
+    if (Array.isArray(prop.enum) && prop.enum.length > 0) {
+      values = prop.enum;
+    } else if (prop.const !== undefined) {
+      values = [prop.const];
+    }
+    if (values !== undefined) result.push({ name, values });
+  }
+  return result;
+}
+
 /**
  * Gets the items schema from an array schema
  */

@@ -18,6 +18,8 @@ const ArrayEditor = lazy(() => import("./types/ArrayEditor.tsx"));
 export interface TypeEditorProps {
   schema: JSONSchema;
   readOnly: boolean;
+  parentSchema?: ObjectJSONSchema;
+  propertyName?: string;
   validationNode: ValidationTreeNode | undefined;
   onChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
@@ -29,6 +31,8 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   onChange,
   depth = 0,
   readOnly = false,
+  parentSchema,
+  propertyName,
 }) => {
   const t = useTranslation();
   const type = withObjectSchema(
@@ -45,6 +49,8 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           schema={schema}
           onChange={onChange}
           depth={depth}
+          parentSchema={parentSchema}
+          propertyName={propertyName}
           validationNode={validationNode}
         />
       )}
@@ -54,6 +60,8 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           schema={schema}
           onChange={onChange}
           depth={depth}
+          parentSchema={parentSchema}
+          propertyName={propertyName}
           validationNode={validationNode}
         />
       )}
@@ -63,6 +71,8 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           schema={schema}
           onChange={onChange}
           depth={depth}
+          parentSchema={parentSchema}
+          propertyName={propertyName}
           validationNode={validationNode}
           integer
         />

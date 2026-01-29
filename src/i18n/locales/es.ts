@@ -121,6 +121,10 @@ export const es: Translation = {
   stringAllowedValuesEnumNone: "No hay valores restringidos",
   stringAllowedValuesEnumAddPlaceholder: "Agregar valor permitido...",
   stringAllowedValuesEnumAddLabel: "Agregar",
+  enumModeStatic: "Lista fija",
+  enumModeDependsOn: "Depende de propiedad",
+  enumDependsOnPlaceholder: "Seleccionar propiedad...",
+  whenPropertyEquals: "Cuando {property} = {value}",
   stringFormatSelectPlaceholder: "Seleccionar formato",
   stringValidationErrorLengthRange:
     "'Longitud Mínima' no puede ser mayor que 'Longitud Máxima'.",

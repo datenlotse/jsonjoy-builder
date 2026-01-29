@@ -122,6 +122,10 @@ export const ru: Translation = {
   stringAllowedValuesEnumNone: "Нет ограниченных значений",
   stringAllowedValuesEnumAddPlaceholder: "Добавить разрешенное значение...",
   stringAllowedValuesEnumAddLabel: "Добавить",
+  enumModeStatic: "Фиксированный список",
+  enumModeDependsOn: "Зависит от свойства",
+  enumDependsOnPlaceholder: "Выберите свойство...",
+  whenPropertyEquals: "Когда {property} = {value}",
   stringFormatSelectPlaceholder: "Выберите формат",
   stringValidationErrorLengthRange:
     "'Минимальная длина' не может быть больше 'Максимальной длины'.",

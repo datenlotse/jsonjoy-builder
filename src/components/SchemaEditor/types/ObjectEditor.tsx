@@ -139,6 +139,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
               name={property.name}
               schema={property.schema}
               required={property.required}
+              parentSchema={normalizedSchema}
               validationNode={validationNode?.children[property.name]}
               onDelete={() => handleDeleteProperty(property.name)}
               onNameChange={(newName) =>

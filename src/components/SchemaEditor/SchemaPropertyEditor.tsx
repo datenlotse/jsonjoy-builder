@@ -23,6 +23,7 @@ export interface SchemaPropertyEditorProps {
   schema: JSONSchema;
   required: boolean;
   readOnly: boolean;
+  parentSchema?: ObjectJSONSchema;
   validationNode?: ValidationTreeNode;
   onDelete: () => void;
   onNameChange: (newName: string) => void;
@@ -38,6 +39,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   schema,
   required,
   readOnly = false,
+  parentSchema,
   validationNode,
   onDelete,
   onNameChange,
@@ -324,6 +326,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           <TypeEditor
             schema={schema}
             readOnly={readOnly}
+            parentSchema={parentSchema}
+            propertyName={name}
             validationNode={validationNode}
             onChange={handleSchemaUpdate}
             depth={depth + 1}

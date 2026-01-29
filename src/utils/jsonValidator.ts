@@ -1,5 +1,6 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import { compileDependentEnums } from "../lib/schemaCompile.ts";
 import type { JSONSchema } from "../types/jsonSchema.ts";
 
 // Initialize Ajv with all supported formats and meta-schemas
@@ -171,8 +172,8 @@ export function validateJson(
     // Parse the JSON input
     const jsonObject = JSON.parse(jsonInput);
 
-    // Use Ajv to validate the JSON against the schema
-    const validate = ajv.compile(schema);
+    const compiledSchema = compileDependentEnums(schema);
+    const validate = ajv.compile(compiledSchema);
     const valid = validate(jsonObject);
 
     if (!valid) {

@@ -92,7 +92,15 @@ export type JSONSchema =
       else?: JSONSchema;
       // Custom extension for explicit property ordering
       $propertyOrder?: string[];
+      // Custom extension: enum values depend on another property's value
+      $dependentEnum?: DependentEnumExtension;
     });
+
+/** @public - Shape for $dependentEnum: enum of this property depends on sibling property value */
+export interface DependentEnumExtension {
+  property: string;
+  values: Record<string, unknown[]>;
+}
 
 // Define Zod schema with recursive types
 export const jsonSchemaType: z.ZodType<JSONSchema> = z.lazy(() =>
