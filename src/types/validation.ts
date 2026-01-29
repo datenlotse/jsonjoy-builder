@@ -2,7 +2,6 @@ import z from "zod";
 import type { Translation } from "../i18n/translation-keys.ts";
 import {
   baseSchema,
-  type DependentEnumExtension,
   type JSONSchema,
   type ObjectJSONSchema,
 } from "./jsonSchema.ts";
