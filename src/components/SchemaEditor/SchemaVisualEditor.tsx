@@ -129,7 +129,10 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
       {!readOnly && (
         <div className="mb-6 shrink-0">
-          <AddFieldButton onAddField={handleAddField} />
+          <AddFieldButton
+            parentSchema={asObjectSchema(schema)}
+            onAddField={handleAddField}
+          />
         </div>
       )}
 

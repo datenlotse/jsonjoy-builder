@@ -173,7 +173,11 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
 
       {!readOnly && (
         <div className="mt-4">
-          <AddFieldButton onAddField={handleAddProperty} variant="secondary" />
+          <AddFieldButton
+            parentSchema={normalizedSchema}
+            onAddField={handleAddProperty}
+            variant="secondary"
+          />
         </div>
       )}
     </div>

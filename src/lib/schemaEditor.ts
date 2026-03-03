@@ -278,8 +278,9 @@ export function renameObjectProperty(
     }
   }
 
-  // Add any properties not in the order array
+  // Add any properties not in the order array (skip oldName since it was renamed)
   for (const [key, value] of Object.entries(newSchema.properties)) {
+    if (key === oldName) continue;
     if (!(key in newProperties)) {
       newProperties[key] = value;
     }

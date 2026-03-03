@@ -1,5 +1,5 @@
 import { CirclePlus, HelpCircle, Info } from "lucide-react";
-import { type FC, type FormEvent, useId, useState } from "react";
+import { type FC, type FormEvent, useEffect, useId, useState } from "react";
 import { Badge } from "../../components/ui/badge.tsx";
 import { Button } from "../../components/ui/button.tsx";
 import {
@@ -18,15 +18,28 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
-import type { NewField, SchemaType } from "../../types/jsonSchema.ts";
+import type {
+  NewField,
+  ObjectJSONSchema,
+  SchemaType,
+} from "../../types/jsonSchema.ts";
 import SchemaTypeSelector from "./SchemaTypeSelector.tsx";
+import TypeEditor from "./TypeEditor.tsx";
 
 interface AddFieldButtonProps {
+  parentSchema: ObjectJSONSchema;
   onAddField: (field: NewField) => void;
   variant?: "primary" | "secondary";
 }
 
+const ENUM_TYPES: SchemaType[] = ["string", "number", "integer"];
+
+function createEmptyDraftSchema(type: SchemaType): ObjectJSONSchema {
+  return { type };
+}
+
 const AddFieldButton: FC<AddFieldButtonProps> = ({
+  parentSchema,
   onAddField,
   variant = "primary",
 }) => {
@@ -35,6 +48,9 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
   const [fieldType, setFieldType] = useState<SchemaType>("string");
   const [fieldDesc, setFieldDesc] = useState("");
   const [fieldRequired, setFieldRequired] = useState(false);
+  const [draftSchema, setDraftSchema] = useState<ObjectJSONSchema>(() =>
+    createEmptyDraftSchema("string"),
+  );
   const fieldNameId = useId();
   const fieldDescId = useId();
   const fieldRequiredId = useId();
@@ -42,21 +58,44 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 
   const t = useTranslation();
 
+  useEffect(() => {
+    setDraftSchema((prev) => {
+      const nextType = fieldType;
+      const prevType = prev.type;
+      if (prevType === nextType) return prev;
+      return createEmptyDraftSchema(nextType);
+    });
+  }, [fieldType]);
+
+  useEffect(() => {
+    if (dialogOpen) {
+      setDraftSchema(createEmptyDraftSchema(fieldType));
+    }
+  }, [dialogOpen]);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!fieldName.trim()) return;
 
+    const validation: ObjectJSONSchema | undefined =
+      ENUM_TYPES.includes(fieldType) && Object.keys(draftSchema).length > 1
+        ? { ...draftSchema, type: fieldType }
+        : undefined;
+
     onAddField({
-      name: fieldName,
+      name: fieldName.trim(),
       type: fieldType,
       description: fieldDesc,
       required: fieldRequired,
+      default: draftSchema.default,
+      validation,
     });
 
     setFieldName("");
     setFieldType("string");
     setFieldDesc("");
     setFieldRequired(false);
+    setDraftSchema(createEmptyDraftSchema("string"));
     setDialogOpen(false);
   };
 
@@ -216,6 +255,25 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                 </div>
               </div>
             </div>
+
+            {ENUM_TYPES.includes(fieldType) && (
+              <details className="group rounded-lg border bg-muted/30">
+                <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium">
+                  {t.stringAllowedValuesEnumLabel}
+                </summary>
+                <div className="border-t px-4 pb-4 pt-2">
+                  <TypeEditor
+                    schema={draftSchema}
+                    readOnly={false}
+                    parentSchema={parentSchema}
+                    propertyName={fieldName.trim() || undefined}
+                    validationNode={undefined}
+                    onChange={setDraftSchema}
+                    depth={1}
+                  />
+                </div>
+              </details>
+            )}
 
             <DialogFooter className="mt-6 gap-2 flex-wrap">
               <Button

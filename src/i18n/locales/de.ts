@@ -35,7 +35,7 @@ export const de: Translation = {
   fieldTypeBooleanDescription: "Für Wahr/Falsch-Werte",
   fieldTypeObjectLabel: "Gruppe",
   fieldTypeObjectDescription: "Zum Gruppieren verwandter Felder",
-  fieldTypeArrayLabel: "Liste",
+  fieldTypeArrayLabel: "Mehrfach-Auswahl",
   fieldTypeArrayDescription: "Für Sammlungen von Elementen",
 
   propertyDescriptionPlaceholder: "Beschreibung hinzufügen...",
@@ -135,10 +135,10 @@ export const de: Translation = {
   stringValidationErrorLengthRange:
     "'Minimale Länge' darf nicht größer als 'Maximale Länge' sein.",
 
-  schemaTypeArray: "Liste",
+  schemaTypeArray: "Mehrfach-Auswahl",
   schemaTypeBoolean: "Ja/Nein",
   schemaTypeNumber: "Zahl",
-  schemaTypeObject: "Objekt",
+  schemaTypeObject: "Gruppe",
   schemaTypeString: "Text",
   schemaTypeNull: "Leer",
 
