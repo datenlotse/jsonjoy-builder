@@ -232,10 +232,11 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           <TypeDropdown
             readOnly={readOnly}
             value={itemType}
+            excludeTypes={["wzm"]}
             onChange={(newType) => {
               handleItemSchemaChange({
                 ...withObjectSchema(itemsSchema, (s) => s, {}),
-                type: newType,
+                type: newType as SchemaType,
               });
             }}
           />

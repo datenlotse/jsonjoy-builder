@@ -19,6 +19,7 @@ export const en: Translation = {
   fieldTypeTooltipBoolean: "boolean: True/false",
   fieldTypeTooltipObject: "object: Nested JSON",
   fieldTypeTooltipArray: "array: Lists of values",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "Add Field",
   fieldAddNewBadge: "Schema Builder",
   fieldAddNewCancel: "Cancel",
@@ -36,6 +37,8 @@ export const en: Translation = {
   fieldTypeObjectDescription: "For grouping related fields together",
   fieldTypeArrayLabel: "List",
   fieldTypeArrayDescription: "For collections of items",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Add description...",
   propertyDescriptionButton: "Add description...",
@@ -137,6 +140,9 @@ export const en: Translation = {
   schemaTypeObject: "Object",
   schemaTypeString: "Text",
   schemaTypeNull: "Empty",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Example",
+  wzmExamplePlaceholder: 'e.g. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "Infer JSON Schema",
   inferrerDescription:

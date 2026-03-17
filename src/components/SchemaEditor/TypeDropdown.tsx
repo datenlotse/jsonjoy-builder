@@ -2,21 +2,24 @@ import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn, getTypeColor, getTypeLabel } from "../../lib/utils.ts";
-import type { SchemaType } from "../../types/jsonSchema.ts";
+import type { DisplaySchemaType } from "../../types/jsonSchema.ts";
 
 export interface TypeDropdownProps {
-  value: SchemaType;
-  onChange: (value: SchemaType) => void;
+  value: DisplaySchemaType;
+  onChange: (value: DisplaySchemaType) => void;
   className?: string;
   readOnly: boolean;
+  /** Types to exclude from the dropdown (e.g. "wzm" when editing array item type) */
+  excludeTypes?: DisplaySchemaType[];
 }
 
-const typeOptions: SchemaType[] = [
+const typeOptions: DisplaySchemaType[] = [
   "string",
   "number",
   "boolean",
   "object",
   "array",
+  "wzm",
   "null",
 ];
 
@@ -25,7 +28,9 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   onChange,
   className,
   readOnly,
+  excludeTypes = [],
 }) => {
+  const options = typeOptions.filter((t) => !excludeTypes.includes(t));
   const t = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -67,7 +72,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
       {isOpen && (
         <div className="absolute z-50 mt-1 w-[140px] rounded-md border bg-popover shadow-lg animate-in fade-in-50 zoom-in-95">
           <div className="py-1">
-            {typeOptions.map((type) => (
+            {options.map((type) => (
               <button
                 key={type}
                 type="button"

@@ -19,6 +19,7 @@ export const zh: Translation = {
   fieldTypeTooltipBoolean: "boolean: true/false",
   fieldTypeTooltipObject: "object: 嵌套的 JSON 对象",
   fieldTypeTooltipArray: "array: 数组",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "添加字段",
   fieldAddNewBadge: "Schema 构建器",
   fieldAddNewCancel: "取消",
@@ -36,6 +37,8 @@ export const zh: Translation = {
   fieldTypeObjectDescription: "用于分组相关的字段",
   fieldTypeArrayLabel: "数组",
   fieldTypeArrayDescription: "用于集合的项",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "添加描述...",
   propertyDescriptionButton: "添加描述...",
@@ -134,6 +137,9 @@ export const zh: Translation = {
   schemaTypeObject: "对象",
   schemaTypeString: "字符串",
   schemaTypeNull: "空",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "示例",
+  wzmExamplePlaceholder: '例如 ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "推断 JSON Schema",
   inferrerDescription: "粘贴您的 JSON 文档以生成对应的 Schema。",

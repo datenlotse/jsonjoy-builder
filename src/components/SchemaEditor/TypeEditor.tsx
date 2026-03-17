@@ -5,7 +5,7 @@ import type {
   ObjectJSONSchema,
   SchemaType,
 } from "../../types/jsonSchema.ts";
-import { withObjectSchema } from "../../types/jsonSchema.ts";
+import { getDisplayType, withObjectSchema } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
 
 // Lazy load specific type editors to avoid circular dependencies
@@ -14,6 +14,7 @@ const NumberEditor = lazy(() => import("./types/NumberEditor.tsx"));
 const BooleanEditor = lazy(() => import("./types/BooleanEditor.tsx"));
 const ObjectEditor = lazy(() => import("./types/ObjectEditor.tsx"));
 const ArrayEditor = lazy(() => import("./types/ArrayEditor.tsx"));
+const WzmEditor = lazy(() => import("./types/WzmEditor.tsx"));
 
 export interface TypeEditorProps {
   schema: JSONSchema;
@@ -35,6 +36,7 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   propertyName,
 }) => {
   const t = useTranslation();
+  const displayType = getDisplayType(schema);
   const type = withObjectSchema(
     schema,
     (s) => (s.type || "object") as SchemaType,
@@ -95,7 +97,16 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           validationNode={validationNode}
         />
       )}
-      {type === "array" && (
+      {displayType === "wzm" && (
+        <WzmEditor
+          readOnly={readOnly}
+          schema={schema}
+          onChange={onChange}
+          depth={depth}
+          validationNode={validationNode}
+        />
+      )}
+      {type === "array" && displayType !== "wzm" && (
         <ArrayEditor
           readOnly={readOnly}
           schema={schema}

@@ -1,5 +1,6 @@
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import {
+  createFieldSchema,
   getSchemaProperties,
   reorderObjectProperty,
   removeObjectProperty,
@@ -31,17 +32,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
 
   // Handle adding a new property
   const handleAddProperty = (newField: NewField) => {
-    // Create field schema from the new field data
-    const fieldSchema = {
-      type: newField.type,
-      description: newField.description || undefined,
-      ...(newField.validation || {}),
-    } as ObjectJSONSchema;
-    
-    // Include default value if present
-    if (newField.default !== undefined) {
-      fieldSchema.default = newField.default;
-    }
+    const fieldSchema = createFieldSchema(newField);
 
     // Add the property to the schema
     let newSchema = updateObjectProperty(

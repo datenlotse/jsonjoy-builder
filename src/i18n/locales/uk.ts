@@ -20,6 +20,7 @@ export const uk: Translation = {
   fieldTypeTooltipBoolean: "boolean: Так/Ні",
   fieldTypeTooltipObject: "object: Вкладений JSON",
   fieldTypeTooltipArray: "array: Списки значень",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "Додати поле",
   fieldAddNewBadge: "Конструктор схем",
   fieldAddNewCancel: "Скасувати",
@@ -37,6 +38,8 @@ export const uk: Translation = {
   fieldTypeObjectDescription: "Для групування пов'язаних полів",
   fieldTypeArrayLabel: "Список",
   fieldTypeArrayDescription: "Для колекцій елементів",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Додати опис...",
   propertyDescriptionButton: "Додати опис...",
@@ -140,6 +143,9 @@ export const uk: Translation = {
   schemaTypeObject: "Об'єкт",
   schemaTypeString: "Текст",
   schemaTypeNull: "Пусто",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Приклад",
+  wzmExamplePlaceholder: 'напр. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "Вивести JSON-схему",
   inferrerDescription:

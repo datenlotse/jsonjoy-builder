@@ -20,6 +20,7 @@ export const ru: Translation = {
   fieldTypeTooltipBoolean: "логическое: Истина/ложь",
   fieldTypeTooltipObject: "объект: Вложенный JSON",
   fieldTypeTooltipArray: "массив: Списки значений",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "Добавить поле",
   fieldAddNewBadge: "Конструктор схем",
   fieldAddNewCancel: "Отмена",
@@ -38,6 +39,8 @@ export const ru: Translation = {
   fieldTypeObjectDescription: "Для группировки связанных полей вместе",
   fieldTypeArrayLabel: "Список",
   fieldTypeArrayDescription: "Для коллекций элементов",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Добавить описание...",
   propertyDescriptionButton: "Добавить описание...",
@@ -141,6 +144,9 @@ export const ru: Translation = {
   schemaTypeObject: "Объект",
   schemaTypeString: "Текст",
   schemaTypeNull: "Пусто",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Пример",
+  wzmExamplePlaceholder: 'напр. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "Вывести схему JSON",
   inferrerDescription:

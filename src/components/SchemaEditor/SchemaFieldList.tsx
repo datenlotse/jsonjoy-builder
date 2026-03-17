@@ -2,11 +2,13 @@ import { type FC, useMemo } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
 import type {
+  DisplaySchemaType,
   JSONSchema as JSONSchemaType,
   NewField,
   ObjectJSONSchema,
   SchemaType,
 } from "../../types/jsonSchema.ts";
+import { isWzmSchema } from "../../types/jsonSchema.ts";
 import { buildValidationTree } from "../../types/validation.ts";
 import SchemaPropertyEditor from "./SchemaPropertyEditor.tsx";
 
@@ -31,17 +33,21 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   // Get the properties from the schema
   const properties = getSchemaProperties(schema);
 
-  // Get schema type as a valid SchemaType
-  const getValidSchemaType = (propSchema: JSONSchemaType): SchemaType => {
+  // Get schema type as DisplaySchemaType (includes "wzm")
+  const getValidSchemaType = (
+    propSchema: JSONSchemaType,
+  ): DisplaySchemaType => {
     if (typeof propSchema === "boolean") return "object";
+    if (isWzmSchema(propSchema)) return "wzm";
 
     // Handle array of types by picking the first one
-    const type = propSchema.type;
+    const objSchema = propSchema as ObjectJSONSchema;
+    const type = objSchema.type;
     if (Array.isArray(type)) {
-      return type[0] || "object";
+      return (type[0] || "object") as DisplaySchemaType;
     }
 
-    return type || "object";
+    return (type || "object") as DisplaySchemaType;
   };
 
   // Handle field name change (generates an edit event)
@@ -92,9 +98,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     const property = properties.find((prop) => prop.name === name);
     if (!property) return;
 
-    const type = updatedSchema.type || "object";
-    // Ensure we're using a single type, not an array of types
-    const validType = Array.isArray(type) ? type[0] || "object" : type;
+    const validType = getValidSchemaType(updatedSchema);
 
     onEditField(name, {
       name,

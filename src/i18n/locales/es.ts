@@ -19,6 +19,7 @@ export const es: Translation = {
   fieldTypeTooltipBoolean: "boolean: Verdadero/falso",
   fieldTypeTooltipObject: "object: JSON anidado",
   fieldTypeTooltipArray: "array: Listas de valores",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "Agregar Campo",
   fieldAddNewBadge: "Constructor de Schema",
   fieldAddNewCancel: "Cancelar",
@@ -37,6 +38,8 @@ export const es: Translation = {
   fieldTypeObjectDescription: "Para agrupar campos relacionados",
   fieldTypeArrayLabel: "Lista",
   fieldTypeArrayDescription: "Para colecciones de elementos",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Agregar descripción...",
   propertyDescriptionButton: "Agregar descripción...",
@@ -140,6 +143,9 @@ export const es: Translation = {
   schemaTypeObject: "Objeto",
   schemaTypeString: "Texto",
   schemaTypeNull: "Vacío",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Ejemplo",
+  wzmExamplePlaceholder: 'ej. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "Inferir JSON Schema",
   inferrerDescription:

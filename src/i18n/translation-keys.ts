@@ -102,6 +102,12 @@ export interface Translation {
    * > array: Lists of values
    */
   readonly fieldTypeTooltipArray: string;
+  /**
+   * The translation for the key `fieldTypeTooltipWzm`. English default is:
+   *
+   * > wzm: Werkzeugmaschinen (multi-select)
+   */
+  readonly fieldTypeTooltipWzm: string;
 
   /**
    * The translation for the key `fieldAddNewButton`. English default is:
@@ -200,6 +206,18 @@ export interface Translation {
    * > For collections of items
    */
   readonly fieldTypeArrayDescription: string;
+  /**
+   * The translation for the key `fieldTypeWzmLabel`. English default is:
+   *
+   * > WZM
+   */
+  readonly fieldTypeWzmLabel: string;
+  /**
+   * The translation for the key `fieldTypeWzmDescription`. English default is:
+   *
+   * > Werkzeugmaschinen
+   */
+  readonly fieldTypeWzmDescription: string;
 
   /**
    * The translation for the key `propertyDescriptionPlaceholder`. English default is:
@@ -693,6 +711,24 @@ export interface Translation {
    * > Empty
    */
   readonly schemaTypeNull: string;
+  /**
+   * The translation for the key `schemaTypeWzm`. English default is:
+   *
+   * > WZM
+   */
+  readonly schemaTypeWzm: string;
+  /**
+   * The translation for the key `wzmExampleLabel`. English default is:
+   *
+   * > Example
+   */
+  readonly wzmExampleLabel: string;
+  /**
+   * The translation for the key `wzmExamplePlaceholder`. English default is:
+   *
+   * > e.g. ["uuid-1", "uuid-2"]
+   */
+  readonly wzmExamplePlaceholder: string;
 
   /**
    * The translation for the key `schemaEditorTitle`. English default is:

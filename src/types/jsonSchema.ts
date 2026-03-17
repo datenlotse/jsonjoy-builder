@@ -63,6 +63,9 @@ export const baseSchema = z.object({
   // Value validations
   const: z.unknown().optional(),
   enum: z.array(z.unknown()).optional(),
+
+  // Custom extension: WZM (Werkzeugmaschine) multi-select discriminator
+  "x-schemaType": z.string().optional(),
 });
 
 // Define recursive schema type
@@ -134,9 +137,12 @@ export const jsonSchemaType: z.ZodType<JSONSchema> = z.lazy(() =>
 // Derive our types from the schema
 export type SchemaType = (typeof simpleTypes)[number];
 
+/** Display type for UI; includes "wzm" which maps to array + x-schemaType */
+export type DisplaySchemaType = SchemaType | "wzm";
+
 export interface NewField {
   name: string;
-  type: SchemaType;
+  type: DisplaySchemaType;
   description: string;
   required: boolean;
   default?: unknown;
@@ -146,7 +152,7 @@ export interface NewField {
 export interface SchemaEditorState {
   schema: JSONSchema;
   fieldInfo: {
-    type: SchemaType;
+    type: DisplaySchemaType;
     properties: Array<{
       name: string;
       path: string[];
@@ -183,4 +189,21 @@ export function withObjectSchema<T>(
   defaultValue: T,
 ): T {
   return isObjectSchema(schema) ? fn(schema) : defaultValue;
+}
+
+/** Check if schema is a WZM (Werkzeugmaschine) multi-select field */
+export function isWzmSchema(schema: JSONSchema): schema is ObjectJSONSchema {
+  return (
+    isObjectSchema(schema) &&
+    schema.type === "array" &&
+    (schema as ObjectJSONSchema & { "x-schemaType"?: string })["x-schemaType"] === "wzm"
+  );
+}
+
+/** Get display type for UI; returns "wzm" when schema has x-schemaType: "wzm" */
+export function getDisplayType(schema: JSONSchema): DisplaySchemaType {
+  if (isWzmSchema(schema)) return "wzm";
+  const t = isObjectSchema(schema) ? schema.type : undefined;
+  const type = Array.isArray(t) ? t[0] : t;
+  return (type || "object") as DisplaySchemaType;
 }

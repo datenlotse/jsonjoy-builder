@@ -20,6 +20,7 @@ export const fr: Translation = {
   fieldTypeTooltipBoolean: "booléen: Vrai/faux",
   fieldTypeTooltipObject: "objet: JSON imbriqué",
   fieldTypeTooltipArray: "tableau: Listes de valeurs",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (multi-select)",
   fieldAddNewButton: "Ajouter un champ",
   fieldAddNewBadge: "Constructeur de schéma",
   fieldAddNewCancel: "Annuler",
@@ -38,6 +39,8 @@ export const fr: Translation = {
   fieldTypeObjectDescription: "Pour regrouper des champs connexes",
   fieldTypeArrayLabel: "Liste",
   fieldTypeArrayDescription: "Pour les collections d'éléments",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Ajouter une description...",
   propertyDescriptionButton: "Ajouter une description...",
@@ -142,6 +145,9 @@ export const fr: Translation = {
   schemaTypeObject: "Objet",
   schemaTypeString: "Texte",
   schemaTypeNull: "Vide",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Exemple",
+  wzmExamplePlaceholder: 'ex. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "Déduire le schéma JSON",
   inferrerDescription:

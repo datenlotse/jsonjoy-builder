@@ -19,6 +19,7 @@ import {
 } from "../../components/ui/tooltip.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type {
+  DisplaySchemaType,
   NewField,
   ObjectJSONSchema,
   SchemaType,
@@ -34,7 +35,14 @@ interface AddFieldButtonProps {
 
 const ENUM_TYPES: SchemaType[] = ["string", "number", "integer"];
 
-function createEmptyDraftSchema(type: SchemaType): ObjectJSONSchema {
+function createEmptyDraftSchema(type: DisplaySchemaType): ObjectJSONSchema {
+  if (type === "wzm") {
+    return {
+      type: "array",
+      items: { type: "string", format: "uuid" },
+      "x-schemaType": "wzm",
+    } as ObjectJSONSchema & { "x-schemaType": string };
+  }
   return { type };
 }
 
@@ -45,7 +53,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [fieldName, setFieldName] = useState("");
-  const [fieldType, setFieldType] = useState<SchemaType>("string");
+  const [fieldType, setFieldType] = useState<DisplaySchemaType>("string");
   const [fieldDesc, setFieldDesc] = useState("");
   const [fieldRequired, setFieldRequired] = useState(false);
   const [draftSchema, setDraftSchema] = useState<ObjectJSONSchema>(() =>
@@ -78,8 +86,10 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
     if (!fieldName.trim()) return;
 
     const validation: ObjectJSONSchema | undefined =
-      ENUM_TYPES.includes(fieldType) && Object.keys(draftSchema).length > 1
-        ? { ...draftSchema, type: fieldType }
+      fieldType !== "wzm" &&
+      ENUM_TYPES.includes(fieldType as SchemaType) &&
+      Object.keys(draftSchema).length > 1
+        ? { ...draftSchema, type: fieldType as SchemaType }
         : undefined;
 
     onAddField({
@@ -226,9 +236,8 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                             <div>• {t.fieldTypeTooltipNumber}</div>
                             <div>• {t.fieldTypeTooltipBoolean}</div>
                             <div>• {t.fieldTypeTooltipObject}</div>
-                            <div className="col-span-2">
-                              • {t.fieldTypeTooltipArray}
-                            </div>
+                            <div>• {t.fieldTypeTooltipArray}</div>
+                            <div>• {t.fieldTypeTooltipWzm}</div>
                           </div>
                         </TooltipContent>
                       </Tooltip>
@@ -251,12 +260,13 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                     {fieldType === "boolean" && "true"}
                     {fieldType === "object" && '{ "key": "value" }'}
                     {fieldType === "array" && '["item1", "item2"]'}
+                    {fieldType === "wzm" && '["uuid-1", "uuid-2"]'}
                   </code>
                 </div>
               </div>
             </div>
 
-            {ENUM_TYPES.includes(fieldType) && (
+            {ENUM_TYPES.includes(fieldType as SchemaType) && (
               <details className="group rounded-lg border bg-muted/30">
                 <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium">
                   {t.stringAllowedValuesEnumLabel}

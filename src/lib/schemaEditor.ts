@@ -125,6 +125,20 @@ export function updateArrayItems(
  */
 export function createFieldSchema(field: NewField): JSONSchema {
   const { type, description, default: defaultValue, validation } = field;
+
+  if (type === "wzm") {
+    const schema: ObjectJSONSchema & { "x-schemaType": string } = {
+      type: "array",
+      items: { type: "string", format: "uuid" },
+      "x-schemaType": "wzm",
+      ...(description && { description }),
+      ...(isObjectSchema(validation) &&
+        Array.isArray(validation.examples) &&
+        validation.examples.length > 0 && { examples: validation.examples }),
+    };
+    return schema;
+  }
+
   if (isObjectSchema(validation)) {
     const schema: ObjectJSONSchema = {
       type,

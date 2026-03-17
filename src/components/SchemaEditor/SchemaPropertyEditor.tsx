@@ -11,15 +11,16 @@ import {
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
 import type {
+  DisplaySchemaType,
   JSONSchema,
   ObjectJSONSchema,
-  SchemaType,
 } from "../../types/jsonSchema.ts";
 import {
   asObjectSchema,
+  getDisplayType,
   getSchemaDescription,
   isBooleanSchema,
-  withObjectSchema,
+  isWzmSchema,
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
 import { Badge } from "../ui/badge.tsx";
@@ -63,11 +64,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [tempName, setTempName] = useState(name);
   const [tempDesc, setTempDesc] = useState(getSchemaDescription(schema));
-  const type = withObjectSchema(
-    schema,
-    (s) => (s.type || "object") as SchemaType,
-    "object" as SchemaType,
-  );
+  const type = getDisplayType(schema) as DisplaySchemaType;
 
   const defaultValue = useMemo(() => {
     const objSchema = asObjectSchema(schema);
@@ -78,6 +75,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
   // Determine if we should use Select for default value (enum or dependent enum)
   const defaultValueOptions = useMemo(() => {
+    if (type === "wzm") return null;
     if (type !== "string" && type !== "number" && type !== "integer") {
       return null;
     }
@@ -157,9 +155,19 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     setIsEditingDesc(false);
   };
 
-  // Handle schema changes, preserving description and default
+  // Handle schema changes, preserving description and default (not for WZM)
   const handleSchemaUpdate = (updatedSchema: ObjectJSONSchema) => {
     const description = getSchemaDescription(schema);
+    if (isWzmSchema(schema)) {
+      onSchemaChange({
+        ...updatedSchema,
+        description: description || undefined,
+        type: "array",
+        items: { type: "string", format: "uuid" },
+        "x-schemaType": "wzm",
+      } as ObjectJSONSchema & { "x-schemaType": string });
+      return;
+    }
     const currentDefault = asObjectSchema(schema).default;
     onSchemaChange({
       ...updatedSchema,
@@ -321,6 +329,15 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 value={type}
                 readOnly={readOnly}
                 onChange={(newType) => {
+                  if (newType === "wzm") {
+                    onSchemaChange({
+                      type: "array",
+                      items: { type: "string", format: "uuid" },
+                      "x-schemaType": "wzm",
+                      description: getSchemaDescription(schema) || undefined,
+                    } as ObjectJSONSchema & { "x-schemaType": string });
+                    return;
+                  }
                   onSchemaChange({
                     ...asObjectSchema(schema),
                     type: newType,
@@ -395,8 +412,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         <div className="pt-1 pb-2 px-2 sm:px-3 animate-in space-y-3">
           {readOnly && tempDesc && <p className="pb-2">{tempDesc}</p>}
           
-          {/* Default value editor - not shown for object type as it's just a container */}
-          {!readOnly && type !== "object" && (
+          {/* Default value editor - not shown for object or WZM */}
+          {!readOnly && type !== "object" && type !== "wzm" && (
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">
                 {t.propertyDefaultLabel}

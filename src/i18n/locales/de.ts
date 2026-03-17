@@ -20,6 +20,7 @@ export const de: Translation = {
   fieldTypeTooltipBoolean: "boolean: Wahr/Falsch",
   fieldTypeTooltipObject: "object: Verschachteltes JSON",
   fieldTypeTooltipArray: "array: Liste von Werten",
+  fieldTypeTooltipWzm: "wzm: Werkzeugmaschinen (Mehrfachauswahl)",
   fieldAddNewButton: "Feld hinzufügen",
   fieldAddNewBadge: "Schema-Builder",
   fieldAddNewCancel: "Abbrechen",
@@ -37,6 +38,8 @@ export const de: Translation = {
   fieldTypeObjectDescription: "Zum Gruppieren verwandter Felder",
   fieldTypeArrayLabel: "Mehrfach-Auswahl",
   fieldTypeArrayDescription: "Für Sammlungen von Elementen",
+  fieldTypeWzmLabel: "WZM",
+  fieldTypeWzmDescription: "Werkzeugmaschinen",
 
   propertyDescriptionPlaceholder: "Beschreibung hinzufügen...",
   propertyDescriptionButton: "Beschreibung hinzufügen...",
@@ -141,6 +144,9 @@ export const de: Translation = {
   schemaTypeObject: "Gruppe",
   schemaTypeString: "Text",
   schemaTypeNull: "Leer",
+  schemaTypeWzm: "WZM",
+  wzmExampleLabel: "Beispiel",
+  wzmExamplePlaceholder: 'z.B. ["uuid-1", "uuid-2"]',
 
   inferrerTitle: "JSON-Schema ableiten",
   inferrerDescription:

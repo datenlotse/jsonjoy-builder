@@ -2,16 +2,16 @@ import type { FC } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type { Translation } from "../../i18n/translation-keys.ts";
 import { cn } from "../../lib/utils.ts";
-import type { SchemaType } from "../../types/jsonSchema.ts";
+import type { DisplaySchemaType } from "../../types/jsonSchema.ts";
 
 interface SchemaTypeSelectorProps {
   id?: string;
-  value: SchemaType;
-  onChange: (value: SchemaType) => void;
+  value: DisplaySchemaType;
+  onChange: (value: DisplaySchemaType) => void;
 }
 
 interface TypeOption {
-  id: SchemaType;
+  id: DisplaySchemaType;
   label: keyof Translation;
   description: keyof Translation;
 }
@@ -41,6 +41,11 @@ const typeOptions: TypeOption[] = [
     id: "array",
     label: "fieldTypeArrayLabel",
     description: "fieldTypeArrayDescription",
+  },
+  {
+    id: "wzm",
+    label: "fieldTypeWzmLabel",
+    description: "fieldTypeWzmDescription",
   },
 ];
 
