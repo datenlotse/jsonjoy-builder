@@ -79,7 +79,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
     if (dialogOpen) {
       setDraftSchema(createEmptyDraftSchema(fieldType));
     }
-  }, [dialogOpen]);
+  }, [dialogOpen, fieldType]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
