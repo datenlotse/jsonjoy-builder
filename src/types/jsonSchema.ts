@@ -138,7 +138,11 @@ export const jsonSchemaType: z.ZodType<JSONSchema> = z.lazy(() =>
 export type SchemaType = (typeof simpleTypes)[number];
 
 /** Display type for UI; includes "wzm" which maps to array + x-schemaType */
-export type DisplaySchemaType = SchemaType | "wzm";
+export type DisplaySchemaType =
+  | SchemaType
+  | "wzm"
+  | "hersteller"
+  | "herstellerArtikelnummer";
 
 export interface NewField {
   name: string;
@@ -200,9 +204,31 @@ export function isWzmSchema(schema: JSONSchema): schema is ObjectJSONSchema {
   );
 }
 
+export function isHerstellerSchema(schema: JSONSchema): schema is ObjectJSONSchema {
+  return (
+    isObjectSchema(schema) &&
+    schema.type === "string" &&
+    (schema as ObjectJSONSchema & { "x-schemaType"?: string })["x-schemaType"] ===
+      "hersteller"
+  );
+}
+
+export function isHerstellerArtikelnummerSchema(
+  schema: JSONSchema,
+): schema is ObjectJSONSchema {
+  return (
+    isObjectSchema(schema) &&
+    schema.type === "string" &&
+    (schema as ObjectJSONSchema & { "x-schemaType"?: string })["x-schemaType"] ===
+      "herstellerArtikelnummer"
+  );
+}
+
 /** Get display type for UI; returns "wzm" when schema has x-schemaType: "wzm" */
 export function getDisplayType(schema: JSONSchema): DisplaySchemaType {
   if (isWzmSchema(schema)) return "wzm";
+  if (isHerstellerSchema(schema)) return "hersteller";
+  if (isHerstellerArtikelnummerSchema(schema)) return "herstellerArtikelnummer";
   const t = isObjectSchema(schema) ? schema.type : undefined;
   const type = Array.isArray(t) ? t[0] : t;
   return (type || "object") as DisplaySchemaType;

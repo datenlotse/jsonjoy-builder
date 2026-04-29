@@ -23,6 +23,16 @@ const typeOptions: TypeOption[] = [
     description: "fieldTypeTextDescription",
   },
   {
+    id: "hersteller",
+    label: "fieldTypeHerstellerLabel",
+    description: "fieldTypeHerstellerDescription",
+  },
+  {
+    id: "herstellerArtikelnummer",
+    label: "fieldTypeHerstellerArtikelnummerLabel",
+    description: "fieldTypeHerstellerArtikelnummerDescription",
+  },
+  {
     id: "number",
     label: "fieldTypeNumberLabel",
     description: "fieldTypeNumberDescription",

@@ -20,6 +20,8 @@ import {
   getDisplayType,
   getSchemaDescription,
   isBooleanSchema,
+  isHerstellerArtikelnummerSchema,
+  isHerstellerSchema,
   isWzmSchema,
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
@@ -166,6 +168,18 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         items: { type: "string", format: "uuid" },
         "x-schemaType": "wzm",
       } as ObjectJSONSchema & { "x-schemaType": string });
+      return;
+    }
+    if (isHerstellerSchema(schema) || isHerstellerArtikelnummerSchema(schema)) {
+      const xSchemaType = (
+        schema as ObjectJSONSchema & { "x-schemaType"?: string }
+      )["x-schemaType"];
+      onSchemaChange({
+        ...updatedSchema,
+        description: description || undefined,
+        type: "string",
+        ...(xSchemaType ? { "x-schemaType": xSchemaType } : {}),
+      } as ObjectJSONSchema);
       return;
     }
     const currentDefault = asObjectSchema(schema).default;
@@ -329,6 +343,11 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 value={type}
                 readOnly={readOnly}
                 onChange={(newType) => {
+                  const currentObjSchema = asObjectSchema(schema) as ObjectJSONSchema & {
+                    "x-schemaType"?: string;
+                  };
+                  const { ["x-schemaType"]: _xSchemaType, ...schemaWithoutX } =
+                    currentObjSchema;
                   if (newType === "wzm") {
                     onSchemaChange({
                       type: "array",
@@ -338,8 +357,20 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                     } as ObjectJSONSchema & { "x-schemaType": string });
                     return;
                   }
+                  if (
+                    newType === "hersteller" ||
+                    newType === "herstellerArtikelnummer"
+                  ) {
+                    onSchemaChange({
+                      ...schemaWithoutX,
+                      type: "string",
+                      "x-schemaType": newType,
+                      description: getSchemaDescription(schema) || undefined,
+                    } as ObjectJSONSchema & { "x-schemaType": string });
+                    return;
+                  }
                   onSchemaChange({
-                    ...asObjectSchema(schema),
+                    ...schemaWithoutX,
                     type: newType,
                   });
                 }}

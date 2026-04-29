@@ -220,6 +220,31 @@ export interface Translation {
   readonly fieldTypeWzmDescription: string;
 
   /**
+   * The translation for the key `fieldTypeHerstellerLabel`. English default is:
+   *
+   * > Manufacturer
+   */
+  readonly fieldTypeHerstellerLabel: string;
+  /**
+   * The translation for the key `fieldTypeHerstellerDescription`. English default is:
+   *
+   * > Manufacturer name
+   */
+  readonly fieldTypeHerstellerDescription: string;
+  /**
+   * The translation for the key `fieldTypeHerstellerArtikelnummerLabel`. English default is:
+   *
+   * > Manufacturer part no.
+   */
+  readonly fieldTypeHerstellerArtikelnummerLabel: string;
+  /**
+   * The translation for the key `fieldTypeHerstellerArtikelnummerDescription`. English default is:
+   *
+   * > Manufacturer article/part number
+   */
+  readonly fieldTypeHerstellerArtikelnummerDescription: string;
+
+  /**
    * The translation for the key `propertyDescriptionPlaceholder`. English default is:
    *
    * > Add description...
@@ -717,6 +742,19 @@ export interface Translation {
    * > WZM
    */
   readonly schemaTypeWzm: string;
+
+  /**
+   * The translation for the key `schemaTypeHersteller`. English default is:
+   *
+   * > Hersteller
+   */
+  readonly schemaTypeHersteller: string;
+  /**
+   * The translation for the key `schemaTypeHerstellerArtikelnummer`. English default is:
+   *
+   * > Hersteller Artikelnummer
+   */
+  readonly schemaTypeHerstellerArtikelnummer: string;
   /**
    * The translation for the key `wzmExampleLabel`. English default is:
    *

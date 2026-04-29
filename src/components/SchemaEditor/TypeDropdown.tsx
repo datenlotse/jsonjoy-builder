@@ -15,6 +15,8 @@ export interface TypeDropdownProps {
 
 const typeOptions: DisplaySchemaType[] = [
   "string",
+  "hersteller",
+  "herstellerArtikelnummer",
   "number",
   "boolean",
   "object",

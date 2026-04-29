@@ -41,6 +41,10 @@ export const fr: Translation = {
   fieldTypeArrayDescription: "Pour les collections d'éléments",
   fieldTypeWzmLabel: "WZM",
   fieldTypeWzmDescription: "Werkzeugmaschinen",
+  fieldTypeHerstellerLabel: "Fabricant",
+  fieldTypeHerstellerDescription: "Nom du fabricant",
+  fieldTypeHerstellerArtikelnummerLabel: "Référence fabricant",
+  fieldTypeHerstellerArtikelnummerDescription: "Numéro d’article/pièce fabricant",
 
   propertyDescriptionPlaceholder: "Ajouter une description...",
   propertyDescriptionButton: "Ajouter une description...",
@@ -146,6 +150,8 @@ export const fr: Translation = {
   schemaTypeString: "Texte",
   schemaTypeNull: "Vide",
   schemaTypeWzm: "WZM",
+  schemaTypeHersteller: "Hersteller",
+  schemaTypeHerstellerArtikelnummer: "Hersteller Artikelnummer",
   wzmExampleLabel: "Exemple",
   wzmExamplePlaceholder: 'ex. ["uuid-1", "uuid-2"]',
 

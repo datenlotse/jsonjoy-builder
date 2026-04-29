@@ -8,7 +8,7 @@ import type {
   ObjectJSONSchema,
   SchemaType,
 } from "../../types/jsonSchema.ts";
-import { isWzmSchema } from "../../types/jsonSchema.ts";
+import { getDisplayType } from "../../types/jsonSchema.ts";
 import { buildValidationTree } from "../../types/validation.ts";
 import SchemaPropertyEditor from "./SchemaPropertyEditor.tsx";
 
@@ -38,16 +38,9 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     propSchema: JSONSchemaType,
   ): DisplaySchemaType => {
     if (typeof propSchema === "boolean") return "object";
-    if (isWzmSchema(propSchema)) return "wzm";
+    return getDisplayType(propSchema);
 
-    // Handle array of types by picking the first one
-    const objSchema = propSchema as ObjectJSONSchema;
-    const type = objSchema.type;
-    if (Array.isArray(type)) {
-      return (type[0] || "object") as DisplaySchemaType;
-    }
-
-    return (type || "object") as DisplaySchemaType;
+    // unreachable (kept for type readability)
   };
 
   // Handle field name change (generates an edit event)

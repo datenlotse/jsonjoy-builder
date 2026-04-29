@@ -40,6 +40,10 @@ export const de: Translation = {
   fieldTypeArrayDescription: "Für Sammlungen von Elementen",
   fieldTypeWzmLabel: "WZM",
   fieldTypeWzmDescription: "Werkzeugmaschinen",
+  fieldTypeHerstellerLabel: "Hersteller",
+  fieldTypeHerstellerDescription: "Herstellername",
+  fieldTypeHerstellerArtikelnummerLabel: "Hersteller Artikelnummer",
+  fieldTypeHerstellerArtikelnummerDescription: "Artikel-/Teilenummer des Herstellers",
 
   propertyDescriptionPlaceholder: "Beschreibung hinzufügen...",
   propertyDescriptionButton: "Beschreibung hinzufügen...",
@@ -145,6 +149,8 @@ export const de: Translation = {
   schemaTypeString: "Text",
   schemaTypeNull: "Leer",
   schemaTypeWzm: "WZM",
+  schemaTypeHersteller: "Hersteller",
+  schemaTypeHerstellerArtikelnummer: "Hersteller Artikelnummer",
   wzmExampleLabel: "Beispiel",
   wzmExamplePlaceholder: 'z.B. ["uuid-1", "uuid-2"]',
 

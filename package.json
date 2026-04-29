@@ -14,7 +14,7 @@
     "react"
   ],
   "private": false,
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "module",
   "sideEffects": false,
   "repository": {
@@ -96,7 +96,7 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "global-jsdom": "^27.0.0",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "^0.53.0",
     "next-themes": "^0.4.6",
     "postcss": "^8.5.6",
     "react": "^19.1.1",

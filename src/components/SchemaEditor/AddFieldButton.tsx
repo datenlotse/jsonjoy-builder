@@ -35,12 +35,24 @@ interface AddFieldButtonProps {
 
 const ENUM_TYPES: SchemaType[] = ["string", "number", "integer"];
 
+function asBaseSchemaType(type: DisplaySchemaType): SchemaType | null {
+  if (type === "wzm") return null;
+  if (type === "hersteller" || type === "herstellerArtikelnummer") return "string";
+  return type;
+}
+
 function createEmptyDraftSchema(type: DisplaySchemaType): ObjectJSONSchema {
   if (type === "wzm") {
     return {
       type: "array",
       items: { type: "string", format: "uuid" },
       "x-schemaType": "wzm",
+    } as ObjectJSONSchema & { "x-schemaType": string };
+  }
+  if (type === "hersteller" || type === "herstellerArtikelnummer") {
+    return {
+      type: "string",
+      "x-schemaType": type,
     } as ObjectJSONSchema & { "x-schemaType": string };
   }
   return { type };
@@ -85,11 +97,12 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
     e.preventDefault();
     if (!fieldName.trim()) return;
 
+    const baseType = asBaseSchemaType(fieldType);
     const validation: ObjectJSONSchema | undefined =
-      fieldType !== "wzm" &&
-      ENUM_TYPES.includes(fieldType as SchemaType) &&
+      baseType !== null &&
+      ENUM_TYPES.includes(baseType) &&
       Object.keys(draftSchema).length > 1
-        ? { ...draftSchema, type: fieldType as SchemaType }
+        ? { ...draftSchema, type: baseType }
         : undefined;
 
     onAddField({
@@ -267,7 +280,10 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
             </div>
 
             {fieldType !== "wzm" &&
-              ENUM_TYPES.includes(fieldType as SchemaType) && (
+              (() => {
+                const baseType = asBaseSchemaType(fieldType);
+                return baseType !== null && ENUM_TYPES.includes(baseType);
+              })() && (
                 <TypeEditor
                   schema={draftSchema}
                   readOnly={false}

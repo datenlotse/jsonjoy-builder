@@ -39,6 +39,10 @@ export const zh: Translation = {
   fieldTypeArrayDescription: "用于集合的项",
   fieldTypeWzmLabel: "WZM",
   fieldTypeWzmDescription: "Werkzeugmaschinen",
+  fieldTypeHerstellerLabel: "制造商",
+  fieldTypeHerstellerDescription: "制造商名称",
+  fieldTypeHerstellerArtikelnummerLabel: "制造商料号",
+  fieldTypeHerstellerArtikelnummerDescription: "制造商的物料/零件编号",
 
   propertyDescriptionPlaceholder: "添加描述...",
   propertyDescriptionButton: "添加描述...",
@@ -138,6 +142,8 @@ export const zh: Translation = {
   schemaTypeString: "字符串",
   schemaTypeNull: "空",
   schemaTypeWzm: "WZM",
+  schemaTypeHersteller: "Hersteller",
+  schemaTypeHerstellerArtikelnummer: "Hersteller Artikelnummer",
   wzmExampleLabel: "示例",
   wzmExamplePlaceholder: '例如 ["uuid-1", "uuid-2"]',
 

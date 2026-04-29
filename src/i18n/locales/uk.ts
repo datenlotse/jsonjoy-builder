@@ -40,6 +40,10 @@ export const uk: Translation = {
   fieldTypeArrayDescription: "Для колекцій елементів",
   fieldTypeWzmLabel: "WZM",
   fieldTypeWzmDescription: "Werkzeugmaschinen",
+  fieldTypeHerstellerLabel: "Виробник",
+  fieldTypeHerstellerDescription: "Назва виробника",
+  fieldTypeHerstellerArtikelnummerLabel: "Артикул виробника",
+  fieldTypeHerstellerArtikelnummerDescription: "Номер виробу/деталі виробника",
 
   propertyDescriptionPlaceholder: "Додати опис...",
   propertyDescriptionButton: "Додати опис...",
@@ -144,6 +148,8 @@ export const uk: Translation = {
   schemaTypeString: "Текст",
   schemaTypeNull: "Пусто",
   schemaTypeWzm: "WZM",
+  schemaTypeHersteller: "Hersteller",
+  schemaTypeHerstellerArtikelnummer: "Hersteller Artikelnummer",
   wzmExampleLabel: "Приклад",
   wzmExamplePlaceholder: 'напр. ["uuid-1", "uuid-2"]',
 

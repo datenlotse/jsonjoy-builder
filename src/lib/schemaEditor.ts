@@ -144,6 +144,25 @@ export function createFieldSchema(field: NewField): JSONSchema {
     return schema;
   }
 
+  if (type === "hersteller" || type === "herstellerArtikelnummer") {
+    const examples =
+      validation &&
+      isObjectSchema(validation) &&
+      Array.isArray(validation.examples) &&
+      validation.examples.length > 0
+        ? validation.examples
+        : undefined;
+    const schema: ObjectJSONSchema & { "x-schemaType": string } = {
+      type: "string",
+      "x-schemaType": type,
+      ...(description && { description }),
+      ...(examples && { examples }),
+      ...(isObjectSchema(validation) ? validation : {}),
+    };
+    if (defaultValue !== undefined) schema.default = defaultValue;
+    return schema;
+  }
+
   if (isObjectSchema(validation)) {
     const schema: ObjectJSONSchema = {
       type,

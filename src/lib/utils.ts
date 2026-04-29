@@ -11,6 +11,8 @@ export function cn(...inputs: ClassValue[]) {
 export const getTypeColor = (type: DisplaySchemaType): string => {
   switch (type) {
     case "string":
+    case "hersteller":
+    case "herstellerArtikelnummer":
       return "text-blue-500 bg-blue-50";
     case "number":
     case "integer":
@@ -33,6 +35,10 @@ export const getTypeLabel = (t: Translation, type: DisplaySchemaType): string =>
   switch (type) {
     case "string":
       return t.schemaTypeString;
+    case "hersteller":
+      return t.schemaTypeHersteller;
+    case "herstellerArtikelnummer":
+      return t.schemaTypeHerstellerArtikelnummer;
     case "number":
     case "integer":
       return t.schemaTypeNumber;
