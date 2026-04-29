@@ -266,24 +266,18 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
               </div>
             </div>
 
-            {ENUM_TYPES.includes(fieldType as SchemaType) && (
-              <details className="group rounded-lg border bg-muted/30">
-                <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium">
-                  {t.stringAllowedValuesEnumLabel}
-                </summary>
-                <div className="border-t px-4 pb-4 pt-2">
-                  <TypeEditor
-                    schema={draftSchema}
-                    readOnly={false}
-                    parentSchema={parentSchema}
-                    propertyName={fieldName.trim() || undefined}
-                    validationNode={undefined}
-                    onChange={setDraftSchema}
-                    depth={1}
-                  />
-                </div>
-              </details>
-            )}
+            {fieldType !== "wzm" &&
+              ENUM_TYPES.includes(fieldType as SchemaType) && (
+                <TypeEditor
+                  schema={draftSchema}
+                  readOnly={false}
+                  parentSchema={parentSchema}
+                  propertyName={fieldName.trim() || undefined}
+                  validationNode={undefined}
+                  onChange={setDraftSchema}
+                  depth={1}
+                />
+              )}
 
             <DialogFooter className="mt-6 gap-2 flex-wrap">
               <Button
