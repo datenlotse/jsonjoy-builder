@@ -18,6 +18,7 @@ import type {
 import {
   asObjectSchema,
   getDisplayType,
+  getForcedPropertyNameForType,
   getSchemaDescription,
   isBooleanSchema,
   isHerstellerArtikelnummerSchema,
@@ -67,6 +68,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   const [tempName, setTempName] = useState(name);
   const [tempDesc, setTempDesc] = useState(getSchemaDescription(schema));
   const type = getDisplayType(schema) as DisplaySchemaType;
+  const forcedName = getForcedPropertyNameForType(type);
 
   const defaultValue = useMemo(() => {
     const objSchema = asObjectSchema(schema);
@@ -134,7 +136,22 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     setTempDefault(defaultValue);
   }, [name, schema, defaultValue]);
 
+  useEffect(() => {
+    if (!forcedName) return;
+    if (name !== forcedName) {
+      onNameChange(forcedName);
+      return;
+    }
+    setTempName(forcedName);
+    setIsEditingName(false);
+  }, [forcedName, name, onNameChange]);
+
   const handleNameSubmit = () => {
+    if (forcedName) {
+      setTempName(forcedName);
+      setIsEditingName(false);
+      return;
+    }
     const trimmedName = tempName.trim();
     if (trimmedName && trimmedName !== name) {
       onNameChange(trimmedName);
@@ -296,8 +313,15 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               ) : (
                 <button
                   type="button"
-                  onClick={() => setIsEditingName(true)}
-                  onKeyDown={(e) => e.key === "Enter" && setIsEditingName(true)}
+                  onClick={() => {
+                    if (forcedName) return;
+                    setIsEditingName(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return;
+                    if (forcedName) return;
+                    setIsEditingName(true);
+                  }}
                   className="json-field-label font-medium cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all text-left truncate min-w-[80px] max-w-[50%]"
                 >
                   {name}
@@ -361,6 +385,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                     newType === "hersteller" ||
                     newType === "herstellerArtikelnummer"
                   ) {
+                    const nextForcedName = getForcedPropertyNameForType(newType);
+                    if (nextForcedName && name !== nextForcedName) {
+                      onNameChange(nextForcedName);
+                    }
                     onSchemaChange({
                       ...schemaWithoutX,
                       type: "string",

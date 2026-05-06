@@ -24,6 +24,7 @@ import type {
   ObjectJSONSchema,
   SchemaType,
 } from "../../types/jsonSchema.ts";
+import { getForcedPropertyNameForType } from "../../types/jsonSchema.ts";
 import SchemaTypeSelector from "./SchemaTypeSelector.tsx";
 import TypeEditor from "./TypeEditor.tsx";
 
@@ -78,6 +79,8 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 
   const t = useTranslation();
 
+  const forcedName = getForcedPropertyNameForType(fieldType);
+
   useEffect(() => {
     setDraftSchema((prev) => {
       const nextType = fieldType;
@@ -88,6 +91,11 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
   }, [fieldType]);
 
   useEffect(() => {
+    if (!forcedName) return;
+    setFieldName(forcedName);
+  }, [forcedName]);
+
+  useEffect(() => {
     if (dialogOpen) {
       setDraftSchema(createEmptyDraftSchema(fieldType));
     }
@@ -95,7 +103,8 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!fieldName.trim()) return;
+    const effectiveName = (forcedName ?? fieldName).trim();
+    if (!effectiveName) return;
 
     const baseType = asBaseSchemaType(fieldType);
     const validation: ObjectJSONSchema | undefined =
@@ -106,7 +115,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
         : undefined;
 
     onAddField({
-      name: fieldName.trim(),
+      name: effectiveName,
       type: fieldType,
       description: fieldDesc,
       required: fieldRequired,
@@ -139,8 +148,8 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
       </Button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy">
-          <DialogHeader className="mb-4">
+        <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy flex flex-col overflow-hidden">
+          <DialogHeader className="mb-4 shrink-0">
             <DialogTitle className="text-xl flex flex-wrap items-center gap-2">
               {t.fieldAddNewLabel}
               <Badge variant="secondary" className="text-xs">
@@ -152,8 +161,11 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="flex-1 min-h-0 flex flex-col gap-6"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pr-1 min-h-0">
               <div className="space-y-4 min-w-[280px]">
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -176,11 +188,15 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                   </div>
                   <Input
                     id={fieldNameId}
-                    value={fieldName}
-                    onChange={(e) => setFieldName(e.target.value)}
+                    value={forcedName ?? fieldName}
+                    onChange={(e) => {
+                      if (forcedName) return;
+                      setFieldName(e.target.value);
+                    }}
                     placeholder={t.fieldNamePlaceholder}
                     className="font-mono text-sm w-full"
                     required
+                    readOnly={Boolean(forcedName)}
                   />
                 </div>
 
@@ -284,18 +300,20 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                 const baseType = asBaseSchemaType(fieldType);
                 return baseType !== null && ENUM_TYPES.includes(baseType);
               })() && (
-                <TypeEditor
-                  schema={draftSchema}
-                  readOnly={false}
-                  parentSchema={parentSchema}
-                  propertyName={fieldName.trim() || undefined}
-                  validationNode={undefined}
-                  onChange={setDraftSchema}
-                  depth={1}
-                />
+                <div className="overflow-y-auto pr-1 min-h-0">
+                  <TypeEditor
+                    schema={draftSchema}
+                    readOnly={false}
+                    parentSchema={parentSchema}
+                    propertyName={fieldName.trim() || undefined}
+                    validationNode={undefined}
+                    onChange={setDraftSchema}
+                    depth={1}
+                  />
+                </div>
               )}
 
-            <DialogFooter className="mt-6 gap-2 flex-wrap">
+            <DialogFooter className="sticky bottom-0 -mx-4 sm:-mx-6 -mb-4 sm:-mb-6 px-4 sm:px-6 py-4 mt-2 gap-2 flex-wrap bg-background border-t shrink-0">
               <Button
                 type="button"
                 variant="outline"

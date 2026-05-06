@@ -59,16 +59,18 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
       <button
         type="button"
         className={cn(
-          "text-xs px-3.5 py-1.5 rounded-md font-medium text-center flex items-center justify-between",
+          "text-xs px-3.5 py-1.5 rounded-md font-medium text-center flex items-center justify-between gap-2",
           getTypeColor(value),
           "hover:shadow-xs hover:ring-1 hover:ring-ring/30 active:scale-95 transition-all",
-          readOnly ? "" : "w-[92px]",
+          readOnly ? "" : "min-w-[92px] max-w-[220px]",
           className,
         )}
         onClick={() => !readOnly && setIsOpen(!isOpen)}
       >
-        <span>{getTypeLabel(t, value)}</span>
-        {!readOnly && <ChevronDown size={14} className="ml-1" />}
+        <span className="truncate whitespace-nowrap">
+          {getTypeLabel(t, value)}
+        </span>
+        {!readOnly && <ChevronDown size={14} className="shrink-0" />}
       </button>
 
       {isOpen && (

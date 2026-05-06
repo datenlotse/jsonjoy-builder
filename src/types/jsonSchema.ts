@@ -233,3 +233,11 @@ export function getDisplayType(schema: JSONSchema): DisplaySchemaType {
   const type = Array.isArray(t) ? t[0] : t;
   return (type || "object") as DisplaySchemaType;
 }
+
+export function getForcedPropertyNameForType(
+  type: DisplaySchemaType,
+): string | null {
+  if (type === "hersteller") return "Hersteller";
+  if (type === "herstellerArtikelnummer") return "Hersteller Artikelnummer";
+  return null;
+}
