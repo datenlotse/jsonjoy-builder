@@ -227,6 +227,42 @@ export interface EligibleEnumController {
   values: unknown[];
 }
 
+function getEnumControllerValues(prop: ObjectJSONSchema): unknown[] | undefined {
+  if (Array.isArray(prop.enum) && prop.enum.length > 0) {
+    return prop.enum;
+  }
+  if (prop.const !== undefined) {
+    return [prop.const];
+  }
+
+  const dependentValues = prop.$dependentEnum?.values;
+  if (!dependentValues) return undefined;
+
+  const merged = Object.values(dependentValues).flatMap((values) =>
+    Array.isArray(values) ? values : [],
+  );
+  if (merged.length === 0) return undefined;
+
+  const deduped = new Map<string, unknown>();
+  for (const value of merged) {
+    const key =
+      typeof value === "string"
+        ? `str:${value}`
+        : typeof value === "number"
+          ? `num:${value}`
+          : typeof value === "boolean"
+            ? `bool:${value}`
+            : value === null
+              ? "null"
+              : JSON.stringify(value);
+    if (!deduped.has(key)) {
+      deduped.set(key, value);
+    }
+  }
+
+  return Array.from(deduped.values());
+}
+
 function hasPathTo(
   graph: Map<string, string>,
   from: string,
@@ -270,12 +306,7 @@ export function getEligibleEnumControllingProperties(
     const prop = parentSchema.properties[name];
     if (typeof prop === "boolean") continue;
     if (!prop) continue;
-    let values: unknown[] | undefined;
-    if (Array.isArray(prop.enum) && prop.enum.length > 0) {
-      values = prop.enum;
-    } else if (prop.const !== undefined) {
-      values = [prop.const];
-    }
+    const values = getEnumControllerValues(prop);
     if (values !== undefined) result.push({ name, values });
   }
   return result;

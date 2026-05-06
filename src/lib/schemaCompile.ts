@@ -25,7 +25,27 @@ function transformObject(obj: ObjectJSONSchema): ObjectJSONSchema {
     }
   }
 
-  const dependentProp = Object.entries(props).find(
+  const expandedBranches = expandObjectDependentEnums({
+    ...obj,
+    properties: props,
+  });
+
+  if (expandedBranches.length === 1) {
+    return expandedBranches[0];
+  }
+
+  return {
+    ...(obj.$schema && { $schema: obj.$schema }),
+    ...(obj.$id && { $id: obj.$id }),
+    type: "object",
+    oneOf: expandedBranches,
+  };
+}
+
+function expandObjectDependentEnums(obj: ObjectJSONSchema): ObjectJSONSchema[] {
+  if (!obj.properties) return [obj];
+
+  const dependentProp = Object.entries(obj.properties).find(
     ([, s]) =>
       typeof s === "object" &&
       s !== null &&
@@ -33,49 +53,51 @@ function transformObject(obj: ObjectJSONSchema): ObjectJSONSchema {
       (s as ObjectJSONSchema & { $dependentEnum?: unknown }).$dependentEnum != null,
   );
 
-  if (!dependentProp) {
-    return { ...obj, properties: props };
-  }
+  if (!dependentProp) return [obj];
 
   const [propName, propSchema] = dependentProp;
-  const dep = (propSchema as ObjectJSONSchema & { $dependentEnum?: { property: string; values: Record<string, unknown[]> } }).$dependentEnum;
-  if (!dep) return { ...obj, properties: props };
+  const dep = (
+    propSchema as ObjectJSONSchema & {
+      $dependentEnum?: { property: string; values: Record<string, unknown[]> };
+    }
+  ).$dependentEnum;
+  if (!dep) return [obj];
 
   const controllingName = dep.property;
   const valuesMap = dep.values;
   const controllingValues = Object.keys(valuesMap);
 
-  const oneOfBranches: ObjectJSONSchema[] = controllingValues.map(
-    (ctrlValue) => {
-      const branchProps = { ...props };
-      const controllingSchema = branchProps[controllingName];
-      if (typeof controllingSchema === "object" && controllingSchema !== null) {
-        branchProps[controllingName] = { ...controllingSchema, const: ctrlValue };
-      } else {
-        branchProps[controllingName] = { const: ctrlValue };
-      }
+  return controllingValues.flatMap((ctrlValue) => {
+    const branchProps = { ...obj.properties };
+    const controllingSchema = branchProps[controllingName];
+    if (
+      typeof controllingSchema === "object" &&
+      controllingSchema !== null &&
+      controllingSchema.const !== undefined &&
+      controllingSchema.const !== ctrlValue
+    ) {
+      return [];
+    }
+    if (typeof controllingSchema === "object" && controllingSchema !== null) {
+      branchProps[controllingName] = { ...controllingSchema, const: ctrlValue };
+    } else {
+      branchProps[controllingName] = { const: ctrlValue };
+    }
 
-      const dependentSchema = branchProps[propName];
-      if (typeof dependentSchema === "object" && dependentSchema !== null) {
-        const { $dependentEnum: _d, ...rest } = dependentSchema as ObjectJSONSchema & { $dependentEnum?: unknown };
-        branchProps[propName] = { ...rest, enum: valuesMap[ctrlValue] ?? [] };
-      }
-
-      return {
-        type: "object" as const,
-        properties: branchProps,
-        required: obj.required,
-        $propertyOrder: obj.$propertyOrder,
+    const dependentSchema = branchProps[propName];
+    if (typeof dependentSchema === "object" && dependentSchema !== null) {
+      const { $dependentEnum: _d, ...rest } = dependentSchema as ObjectJSONSchema & {
+        $dependentEnum?: unknown;
       };
-    },
-  );
+      branchProps[propName] = { ...rest, enum: valuesMap[ctrlValue] ?? [] };
+    }
 
-  return {
-    ...(obj.$schema && { $schema: obj.$schema }),
-    ...(obj.$id && { $id: obj.$id }),
-    type: "object",
-    oneOf: oneOfBranches,
-  };
+    return expandObjectDependentEnums({
+      ...obj,
+      type: "object",
+      properties: branchProps,
+    });
+  });
 }
 
 function transformSchema(schema: JSONSchema): JSONSchema {
